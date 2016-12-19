@@ -11,11 +11,13 @@ module.exports = {
 
     handle: function (_ctx, message) {
         ctx = _ctx;
+        options.url = getUrl(ctx.network.torrent);
         getTorrentList(message.from);
     },
 
     handleCallback: function (_ctx, message) {
         ctx = _ctx;
+        options.url = getUrl(ctx.network.torrent);
         ctx.bot.editMessageText("Торрент удален", {
             message_id: message.message.message_id,
             chat_id: message.message.chat.id
@@ -25,6 +27,7 @@ module.exports = {
 
     handleFile: function (_ctx, message) {
         ctx = _ctx;
+        options.url = getUrl(ctx.network.torrent);
         ctx.bot.getFileLink(message.document['file_id']).then(function (result) {
                 addTorrent(message.from, result);
             },
@@ -144,4 +147,8 @@ function bytesToSize(bytes) {
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     if (i == 0) return bytes + ' ' + sizes[i];
     return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
-};
+}
+
+function getUrl(torrent) {
+    return 'http://' + torrent.host + ':' + torrent.port + '/transmission/rpc';
+}
