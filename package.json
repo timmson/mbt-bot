@@ -1,0 +1,36 @@
+{
+  "name": "node-timmson-bot",
+  "version": "0.5.0",
+  "description": "Node sandbox",
+  "main": "bot.js",
+  "dependencies": {
+    "accounting": "0.4.1",
+    "feed-read": "^0.0.1",
+    "log4js": "^0.6.38",
+    "node-nmap": "^3.0.2",
+    "node-persist": "0.0.12",
+    "node-telegram-bot-api": "^0.23.3",
+    "nodearp": "^1.0.2",
+    "request": "^2.74.0",
+    "node-arp": "~1.0.5",
+    "cron": "~1.1.0",
+    "node-lgtv-api": "~0.8.0-beta",
+    "loan-schedule.js": "~0.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodejs bot.js",
+    "test": "nodejs test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://user@timmson666.ddns.net:2222/opt/dev/node"
+  },
+  "keywords": [
+    "timmson",
+    "bot",
+    "node"
+  ],
+  "author": "timmson",
+  "license": "GPL-3.0"
+}
