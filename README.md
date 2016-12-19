@@ -1,4 +1,4 @@
-## General bot
+## personal Telegram bot 
 
 Author: [timmson666@mail.ru](mailto:timmson666@mail.ru)
 
