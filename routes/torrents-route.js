@@ -1,7 +1,6 @@
 var ctx = null;
 
 var options = {
-    url: 'http://localhost:9091/transmission/rpc',
     headers: {
         'Content-Type': 'application/json'
     }
@@ -11,7 +10,7 @@ module.exports = {
 
     handle: function (_ctx, message) {
         ctx = _ctx;
-        options.url = getUrl(ctx.network.torrent);
+        options.url = getUrl(ctx.config.network.torrent);
         getTorrentList(message.from);
     },
 
