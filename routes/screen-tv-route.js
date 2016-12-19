@@ -3,7 +3,8 @@ var imageName = 'screen.jpg';
 
 module.exports = {
     handle: function (ctx, message, sendMessage) {
-        var tvApi = new TvApi(ctx.config.lgTV.host, ctx.config.lgTV.port, ctx.config.lgTV.pairingKey);
+        var lgTV = ctx.network.lgTV;
+        var tvApi = new TvApi(lgTV.host, lgTV.port, lgTV.pairingKey);
         tvApi.authenticate(function (err, sessionKey) {
                 if (err) {
                     console.error(err);
