@@ -1,7 +1,7 @@
 {
-  "name": "node-timmson-bot",
-  "version": "0.5.0",
-  "description": "Node sandbox",
+  "name": "bot-node",
+  "version": "0.8.3",
+  "description": "Private bot",
   "main": "bot.js",
   "dependencies": {
     "accounting": "0.4.1",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://user@timmson666.ddns.net:2222/opt/dev/node"
+    "url": "https://github.com/timmson/bot-node"
   },
   "keywords": [
     "timmson",
