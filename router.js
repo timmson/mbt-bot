@@ -2,6 +2,7 @@ module.exports = {
 
     handle: function (ctx, message) {
         ctx.log.info(message.from.id + ' -> ' + message.text);
+        putMessageToMongo(ctx, message);
         if (isAuth(ctx, message.from.id)) {
             var user = ctx.storage.getItem('user-' + message.from.id);
             var routeName = (message.text == '/start') ? 'start' : (ctx.commands[message.text] == null) ? null : ctx.commands[message.text].command;
@@ -67,4 +68,22 @@ function getReplyMarkups(ctx, userId) {
         }
     }
     return JSON.stringify(replyMarkupArray);
+}
+
+function putMessageToMongo(ctx, message) {
+    var mongo = ctx.config.mongo;
+    var url = 'mongodb://' + mongo.host + ':' + mongo.port + '/' + mongo.database;
+
+    ctx.mongo.connect('mongodb://' + mongo.host + ':' + mongo.port + '/' + mongo.database, (err1, db) => {
+        if (!err1) {
+            db.collection('message').insert(message, (err2, result) => {
+                if (err2) {
+                    ctx.log.error(err2.stack);
+                }
+            });
+        } else {
+            ctx.log.error(err1.stack)
+        }
+        db.close();
+    });
 }

@@ -10,7 +10,8 @@ var ctx = {
     exec: require('child_process').exec,
     config: require('./config/config.js'),
     commands: require('./config/commands.js'),
-    storage: require('node-persist'),
+    mongo: require('mongodb'),
+    storage: require('node-persist'), /*Deprecated. Must use Mongo*/
     log: require('log4js').getLogger(),
     request: require('request'),
     feed: require('feed-read'),
