@@ -37,15 +37,13 @@ module.exports = {
 };
 
 function sendMessage(to, response) {
-    ctx.log.debug(to.username + ' <- ' + response);
-    ctx.bot.sendMessage(to.id, response, {parse_mode: 'HTML'});
+    ctx.bot.sendMessage(to, response, {parse_mode: 'HTML'});
 }
 
 function sendTorrentMessage(to, torrent) {
     var response = torrent['name'] + '\n\n';
     response += parseInt(parseFloat(torrent['percentDone']) * 100) + '%' + ' ' + bytesToSize(torrent['sizeWhenDone']);
-    ctx.log.debug(to.username + ' <- ' + response);
-    ctx.bot.sendMessage(to.id, response, {
+    ctx.bot.sendMessage(to, response, {
         disable_web_page_preview: true,
         reply_markup: JSON.stringify({
             inline_keyboard: [

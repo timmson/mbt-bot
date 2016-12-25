@@ -1,17 +1,17 @@
-var TelegramBot = require('node-telegram-bot-api');
 var CronJob = require('cron').CronJob;
 var accounting = require('accounting');
 
 var router = require('./router.js');
 var tco = require('./modules/tco.js');
+var MessageBot = require('./modules/message-api.js');
+var PersistentApi = require('./modules/persistent-api.js');
 
 
 var ctx = {
     exec: require('child_process').exec,
     config: require('./config/config.js'),
     commands: require('./config/commands.js'),
-    mongo: require('mongodb'),
-    storage: require('node-persist'), /*Deprecated. Must use Mongo*/
+    storage: require('node-persist'), /*Deprecated. Must use ctx.dao*/
     log: require('log4js').getLogger(),
     request: require('request'),
     feed: require('feed-read'),
@@ -25,7 +25,8 @@ var ctx = {
 try {
 
     ctx.storage.initSync({dir: 'db'});
-    ctx.bot = new TelegramBot(ctx.config.token, {polling: true});
+    ctx.bot = new MessageBot(ctx);
+    ctx.dao = new PersistentApi(ctx);
 
     ctx.bot.on('text', function (message) {
         router.handle(ctx, message);

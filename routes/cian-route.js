@@ -58,7 +58,7 @@ function parseAndSend(ctx, userId, offer) {
 }
 
 function sendMessage(ctx, userId, message, inlineKeyboard) {
-    ctx.bot.sendMessage(userId, message, {
+    ctx.bot.sendMessage({id: userId}, message, {
         parse_mode: 'HTML',
         reply_markup: JSON.stringify({inline_keyboard: inlineKeyboard})
     });

@@ -13,8 +13,7 @@ module.exports = {
                         if (err) {
                             console.error(err);
                         } else {
-                            ctx.log.debug(message.from.username + ' <- ' + imageName);
-                            ctx.bot.sendPhoto(message.from.id, imageName, {caption: 'TV Screen'});
+                            ctx.bot.sendPhoto(message.from, imageName, {caption: 'TV Screen'});
                         }
                     });
                 }

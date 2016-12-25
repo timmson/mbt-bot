@@ -78,12 +78,6 @@ module.exports = {
         'owner' : true
     },
 
-    '📸 Instagram': {
-        'command': 'instagram',
-        'hidden': false,
-        'owner' : false
-    },
-
     '🗿 О боте': {
         'command': 'about',
         'hidden': false,

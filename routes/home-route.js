@@ -5,8 +5,7 @@ module.exports = {
 };
 
 function sendMessage(ctx, to, response) {
-    ctx.log.debug(to.username + ' <- ' + response);
-    ctx.bot.sendMessage(to.id, response,
+    ctx.bot.sendMessage(to, response,
         {
             parse_mode: 'HTML',
             reply_markup: {

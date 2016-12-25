@@ -20,19 +20,19 @@ module.exports = {
                     throw new Error;
                 }
                 sendMessage(message.from.id, getTCOSummaryMessage(data));
-                sendGeneralQuestion(message.from.id);
+                sendGeneralQuestion(message.from);
             } catch (err) {
                 ctx.log.error(err.stack);
-                sendGeneralQuestion(message.from.id);
+                sendGeneralQuestion(message.from);
             }
         } else {
             if (user.tco == null || user.tco.length < qa.length) {
-                ctx.bot.sendMessage(message.from.id, qa[0].question, {
+                ctx.bot.sendMessage(message.from, qa[0].question, {
                     reply_markup: JSON.stringify({inline_keyboard: qa[0].answers})
                 });
             } else {
                 user.session = 'tco';
-                sendGeneralQuestion(message.from.id);
+                sendGeneralQuestion(message.from);
             }
         }
 
@@ -70,7 +70,7 @@ module.exports = {
             }
 
             user.session = 'tco';
-            sendGeneralQuestion(message.from.id);
+            sendGeneralQuestion(message.from);
         }
 
         ctx.storage.setItem('user-' + message.from.id, user);
@@ -88,13 +88,13 @@ function getTCOSummaryMessage(data) {
     return response;
 }
 
-function sendMessage(userId, message) {
-    ctx.bot.sendMessage(userId, message, {
+function sendMessage(to, message) {
+    ctx.bot.sendMessage(to, message, {
         parse_mode: 'HTML',
         reply_markup: JSON.stringify({keyboard: [['⬅️ Отмена']], resize_keyboard: true})
     });
 }
 
-function sendGeneralQuestion(userId) {
-    sendMessage(userId, 'Введи средний расход (л/100км) и мощность в л.с.\n Намример, <b>7.5 120</b>');
+function sendGeneralQuestion(to) {
+    sendMessage(to, 'Введи средний расход (л/100км) и мощность в л.с.\n Намример, <b>7.5 120</b>');
 }

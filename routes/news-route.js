@@ -28,8 +28,7 @@ module.exports = {
 };
 
 function sendMessage(to, response) {
-    ctx.log.debug(to.username + ' <- ' + response);
-    ctx.bot.sendMessage(to.id, response, {
+    ctx.bot.sendMessage(to, response, {
         reply_markup: getReplyMarkups(news)
     });
 }
