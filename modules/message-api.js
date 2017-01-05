@@ -30,7 +30,7 @@ MessageBot.prototype.on = function (type, callback) {
 
 MessageBot.prototype.sendMessage = function (to, messageText, params) {
     _ctx.log.info(to.username + ' <- ' + messageText);
-    _ctx.dao.saveMessage({to: to, text: messageText, parameters: params});
+    _ctx.dao.saveMessage({to: to, text: messageText, parameters: params, date: Date.now() / 1000 | 0});
     MessageBot.super_.prototype.sendMessage.call(this, to.id, messageText, params);
 };
 
