@@ -36,7 +36,7 @@ MessageBot.prototype.sendMessage = function (to, messageText, params) {
 
 MessageBot.prototype.sendPhoto = function (to, imageName, params) {
     _ctx.log.info(to.username + ' <- [type:image]');
-    _ctx.dao.saveMessage({to: to, text: {type: 'image', name: imageName}, parameters: params});
+    _ctx.dao.saveMessage({to: to, text: {type: 'image', name: imageName}, parameters: params, date: Date.now() / 1000 | 0});
     MessageBot.super_.prototype.sendPhoto.call(this, to.id, imageName, params);
 };
 
