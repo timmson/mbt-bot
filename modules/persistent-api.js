@@ -25,4 +25,4 @@ PersistentApi.prototype.saveMessage = function (message, callback) {
         }
         db.close();
     });
-}
+};
