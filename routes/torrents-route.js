@@ -70,7 +70,7 @@ function addTorrent(to, url, sessionId) {
     ctx.request.post(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             ctx.log.info(body);
-            sendMessage(ctx, to, "Торрент добавлен");
+            sendMessage(to, "Торрент добавлен");
         } else if (response.statusCode == 409) {
             addTorrent(to, url, response.headers['x-transmission-session-id']);
         } else {
