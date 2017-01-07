@@ -13,7 +13,6 @@
     "node-arp": "~1.0.5",
     "node-lgtv-api": "~0.8.0-beta",
     "node-nmap": "^3.0.2",
-    "node-persist": "0.0.12",
     "node-telegram-bot-api": "^0.23.3",
     "nodearp": "^1.0.2",
     "request": "^2.74.0"

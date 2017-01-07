@@ -105,9 +105,12 @@ function removeTorrent(to, id, sessionId) {
 
 function getTorrentList(to, sessionId) {
 
-    var user = ctx.storage.getItem('user-' + to.id);
-    user.session = 'torrents';
-    ctx.storage.setItem('user-' + to.id, user);
+    ctx.dao.loadUserData(to.id, (err, user) => {
+        if (!err) {
+            user.session = 'torrents';
+            ctx.dao.saveUserData(user);
+        }
+    });
 
     options.headers['X-Transmission-Session-Id'] = sessionId;
     options = addBody(options, {

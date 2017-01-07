@@ -21,28 +21,34 @@ var calculationType = {
 
 module.exports = {
     handle: function (ctx, message) {
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        user.session = 'schedule';
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                user.session = 'schedule';
 
-        if (calculationMessageType[message.text] != null) {
-            sendMessage(ctx, message.from, calculationType[calculationMessageType[message.text]].question);
-            user.schedule = calculationMessageType[message.text];
-        } else {
-            if (user.schedule == null || calculationType[user.schedule] == null) {
-                sendMessage(ctx, message.from, 'Выбирите тип расчета');
-            } else {
-                var calcType = calculationType[user.schedule];
-                calcType.handler(ctx, message, calcType.question);
+                if (calculationMessageType[message.text] != null) {
+                    sendMessage(ctx, message.from, calculationType[calculationMessageType[message.text]].question);
+                    user.schedule = calculationMessageType[message.text];
+                } else {
+                    if (user.schedule == null || calculationType[user.schedule] == null) {
+                        sendMessage(ctx, message.from, 'Выбирите тип расчета');
+                    } else {
+                        var calcType = calculationType[user.schedule];
+                        calcType.handler(ctx, message, calcType.question);
+                    }
+                }
+                ctx.dao.saveUserData(user);
             }
-        }
-        ctx.storage.setItem('user-' + message.from.id, user);
+        });
     }
 };
 
 function sendMessage(ctx, to, response) {
     ctx.bot.sendMessage(to, response, {
         parse_mode: 'HTML',
-        reply_markup: JSON.stringify({keyboard: [['Узнать месячный платеж'], ['Узнать максимальную сумму'], ['⬅️ Отмена']], resize_keyboard: true})
+        reply_markup: JSON.stringify({
+            keyboard: [['Узнать месячный платеж'], ['Узнать максимальную сумму'], ['⬅️ Отмена']],
+            resize_keyboard: true
+        })
     });
 }
 
@@ -83,7 +89,10 @@ function calculateAmount(ctx, message, questionText) {
     if (isNaN(p.paymentAmount) || isNaN(p.term) || isNaN(p.rate)) {
         sendMessage(ctx, message.from, questionText);
     } else {
-        var amount = ctx.toMoney(new LoanSchedule({decimalDigit: 2, dateFormat: 'DD.MM.YYYY'}).calculateMaxLoanAmount(p));
+        var amount = ctx.toMoney(new LoanSchedule({
+            decimalDigit: 2,
+            dateFormat: 'DD.MM.YYYY'
+        }).calculateMaxLoanAmount(p));
         sendMessage(ctx, message.from, 'Максимальная сумма кредита: <b>' + amount + '</b>');
     }
 

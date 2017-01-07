@@ -11,7 +11,6 @@ var ctx = {
     exec: require('child_process').exec,
     config: require('./config/config.js'),
     commands: require('./config/commands.js'),
-    storage: require('node-persist'), /*Deprecated. Must use ctx.dao*/
     log: require('log4js').getLogger(),
     request: require('request'),
     feed: require('feed-read'),
@@ -24,7 +23,6 @@ var ctx = {
 
 try {
 
-    ctx.storage.initSync({dir: 'db'});
     ctx.bot = new MessageBot(ctx);
     ctx.dao = new PersistentApi(ctx);
 

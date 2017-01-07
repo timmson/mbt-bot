@@ -25,24 +25,26 @@ module.exports = {
 
     handle: function (_ctx, message) {
         var ctx = _ctx;
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        user.cian = user.cian || [];
-        ctx.request.get(url, (err, resp, body) => {
-            var points = JSON.parse(body).data.points;
-            for (var key in points) {
-                points[key].offers.map(offer => {
-                        if (user.cian.indexOf(offer.id) < 0) {
-                            user.cian.push(offer.id);
-                            offer['address'] = points[key].content.text;
-                            ctx.log.debug('Cian: Add ' + offer.id);
-                            parseAndSend(ctx, message.from.id, offer);
-                        }
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                user.cian = user.cian || [];
+                ctx.request.get(url, (err, resp, body) => {
+                    var points = JSON.parse(body).data.points;
+                    for (var key in points) {
+                        points[key].offers.map(offer => {
+                                if (user.cian.indexOf(offer.id) < 0) {
+                                    user.cian.push(offer.id);
+                                    offer['address'] = points[key].content.text;
+                                    ctx.log.debug('Cian: Add ' + offer.id);
+                                    parseAndSend(ctx, message.from.id, offer);
+                                }
+                            }
+                        );
                     }
-                );
+                    ctx.dao.saveUserData(user);
+                });
             }
-            ctx.storage.setItem('user-' + message.from.id, user);
         });
-
     }
 };
 

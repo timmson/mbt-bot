@@ -2,31 +2,37 @@ module.exports = {
 
     handle: function (ctx, message) {
         if (isAuth(ctx, message.from.id)) {
-            var user = ctx.storage.getItem('user-' + message.from.id);
-            var routeName = (message.text == '/start') ? 'start' : (ctx.commands[message.text] == null) ? null : ctx.commands[message.text].command;
-            routeName = user != null && user.session != null && routeName == null ? user.session : routeName;
-            if (routeName != null) {
-                try {
-                    var route = require('./routes/' + routeName + '-route.js');
-                    route.handle(ctx, message, this.sendBasicMessage);
-                } catch (err) {
-                    ctx.log.error(err);
+            ctx.dao.loadUserData(message.from.id, (err, user) => {
+                if (!err) {
+                    var routeName = (message.text == '/start') ? 'start' : (ctx.commands[message.text] == null) ? null : ctx.commands[message.text].command;
+                    routeName = user != null && user.session != null && routeName == null ? user.session : routeName;
+                    if (routeName != null) {
+                        try {
+                            var route = require('./routes/' + routeName + '-route.js');
+                            route.handle(ctx, message, this.sendBasicMessage);
+                        } catch (err) {
+                            ctx.log.error(err);
+                        }
+                    } else {
+                        this.sendBasicMessage(ctx, message.from, 'Непонятная команда');
+                    }
                 }
-            } else {
-                this.sendBasicMessage(ctx, message.from, 'Непонятная команда');
-            }
+            });
         }
     },
 
     handleCallback: function (ctx, message) {
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        var routeName = user != null && user.session != null ? user.session : 'tco';
-        try {
-            var route = require('./routes/' + routeName + '-route.js');
-            route.handleCallback(ctx, message);
-        } catch (err) {
-            ctx.log.error(err);
-        }
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                var routeName = user != null && user.session != null ? user.session : 'tco';
+                try {
+                    var route = require('./routes/' + routeName + '-route.js');
+                    route.handleCallback(ctx, message);
+                } catch (err) {
+                    ctx.log.error(err);
+                }
+            }
+        });
     },
 
     handleFile: function (ctx, message) {

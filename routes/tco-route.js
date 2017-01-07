@@ -5,75 +5,81 @@ var ctx = null;
 module.exports = {
     handle: function (_ctx, message) {
         ctx = _ctx;
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        if (user.session != null) {
-            try {
-                var data = {
-                    engineType : 'gas',
-                    user: user.tco,
-                    region: regions[user.tco[0]]
-                };
-                var argArray = message.text.split(' ');
-                data.mileage = parseFloat(argArray[0]);
-                data.horsePower = parseFloat(argArray[1]);
-                if (isNaN(data.mileage) || isNaN(data.horsePower)) {
-                    throw new Error;
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                if (user.session != null) {
+                    try {
+                        var data = {
+                            engineType: 'gas',
+                            user: user.tco,
+                            region: regions[user.tco[0]]
+                        };
+                        var argArray = message.text.split(' ');
+                        data.mileage = parseFloat(argArray[0]);
+                        data.horsePower = parseFloat(argArray[1]);
+                        if (isNaN(data.mileage) || isNaN(data.horsePower)) {
+                            throw new Error;
+                        }
+                        sendMessage(message.from, getTCOSummaryMessage(data));
+                        sendGeneralQuestion(message.from);
+                    } catch (err) {
+                        ctx.log.error(err.stack);
+                        sendGeneralQuestion(message.from);
+                    }
+                } else {
+                    if (user.tco == null || user.tco.length < qa.length) {
+                        ctx.bot.sendMessage(message.from, qa[0].question, {
+                            reply_markup: JSON.stringify({inline_keyboard: qa[0].answers})
+                        });
+                    } else {
+                        user.session = 'tco';
+                        sendGeneralQuestion(message.from);
+                    }
                 }
-                sendMessage(message.from.id, getTCOSummaryMessage(data));
-                sendGeneralQuestion(message.from);
-            } catch (err) {
-                ctx.log.error(err.stack);
-                sendGeneralQuestion(message.from);
-            }
-        } else {
-            if (user.tco == null || user.tco.length < qa.length) {
-                ctx.bot.sendMessage(message.from, qa[0].question, {
-                    reply_markup: JSON.stringify({inline_keyboard: qa[0].answers})
-                });
-            } else {
-                user.session = 'tco';
-                sendGeneralQuestion(message.from);
-            }
-        }
 
-        ctx.storage.setItem('user-' + message.from.id, user);
+                ctx.dao.saveUserData(user);
+            }
+        });
     },
 
     handleCallback: function (_ctx, message) {
         ctx = _ctx;
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        user.tco = (user.tco == null) ? [] : user.tco;
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                user.tco = (user.tco == null) ? [] : user.tco;
 
-        var qaNum = null;
-        for (var i = 0; i < qa.length; i++) {
-            if (qa[i].question == message.message.text) {
-                user.tco[i] = message.data;
-                qaNum = i + 1;
-                break;
+                var qaNum = null;
+                for (var i = 0; i < qa.length; i++) {
+                    if (qa[i].question == message.message.text) {
+                        user.tco[i] = message.data;
+                        qaNum = i + 1;
+                        break;
+                    }
+                }
+
+                if (qaNum != null && qaNum != qa.length) {
+
+                    ctx.bot.editMessageText(qa[qaNum].question, {
+                        message_id: message.message.message_id,
+                        chat_id: message.message.chat.id,
+                        reply_markup: JSON.stringify({inline_keyboard: qa[qaNum].answers})
+                    });
+
+                } else {
+                    if (message.message != null) {
+                        ctx.bot.editMessageText('Данные сохранены', {
+                            message_id: message.message.message_id,
+                            chat_id: message.message.chat.id
+                        });
+                    }
+
+                    user.session = 'tco';
+                    sendGeneralQuestion(message.from);
+                }
+
+                ctx.dao.saveUserData(user);
             }
-        }
-
-        if (qaNum != null && qaNum != qa.length) {
-
-            ctx.bot.editMessageText(qa[qaNum].question, {
-                message_id: message.message.message_id,
-                chat_id: message.message.chat.id,
-                reply_markup: JSON.stringify({inline_keyboard: qa[qaNum].answers})
-            });
-
-        } else {
-            if (message.message != null) {
-                ctx.bot.editMessageText('Данные сохранены', {
-                    message_id: message.message.message_id,
-                    chat_id: message.message.chat.id
-                });
-            }
-
-            user.session = 'tco';
-            sendGeneralQuestion(message.from);
-        }
-
-        ctx.storage.setItem('user-' + message.from.id, user);
+        });
     }
 };
 

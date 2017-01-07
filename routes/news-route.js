@@ -9,21 +9,24 @@ var news = {
     '📽 Фильмы': getKinozalNews,
     '🔮 Линукс': getLinuxNews,
     '🏵 DevLife': getDevLifeNews,
-    '⬅️ Отмена' : null
+    '⬅️ Отмена': null
 };
 
 module.exports = {
     handle: function (_ctx, message) {
         ctx = _ctx;
-        var user = ctx.storage.getItem('user-' + message.from.id);
-        if (user.session != null && news[message.text] != null) {
-            var handler = news[message.text];
-            handler(message.from, this);
-        } else {
-            sendMessage(message.from, 'Выбирите одину из следующих тем');
-        }
-        user.session = 'news';
-        ctx.storage.setItem('user-' + message.from.id, user);
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                user.session = 'news';
+                if (user.session != null && news[message.text] != null) {
+                    var handler = news[message.text];
+                    handler(message.from, this);
+                } else {
+                    sendMessage(message.from, 'Выбирите одину из следующих тем');
+                }
+                ctx.dao.saveUserData(user);
+            }
+        });
     }
 };
 
