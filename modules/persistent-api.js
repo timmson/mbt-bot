@@ -8,24 +8,17 @@ function PersistentApi(ctx) {
 }
 
 PersistentApi.prototype.loadUserData = function (userId, callback) {
-    this.load('user', {'id': userId}, (err, user) => callback(err, user));
+    call(db => db.collection('user').findOne({'id': userId}, callback), callback);
 };
 
 PersistentApi.prototype.saveUserData = function (user, callback) {
-    this.save('user', user, callback);
+    call(db => db.collection('user').updateOne({}, user, {}, callback), callback);
 };
 
 PersistentApi.prototype.saveMessage = function (message, callback) {
-    this.save('message', message, callback);
+    call(db => db.collection('message').insertOne(message, callback), callback);
 };
 
-PersistentApi.prototype.load = function (collectionName, query, callback) {
-    call(db => db.collection(collectionName).findOne(query, callback), callback);
-};
-
-PersistentApi.prototype.save = function (collectionName, item, callback) {
-    call(db => db.collection(collectionName).updateOne({}, item, {}, callback), callback);
-};
 
 function connect(callback) {
     const mongoCfg = _ctx.config.mongo;
