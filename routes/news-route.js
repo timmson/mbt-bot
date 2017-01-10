@@ -17,13 +17,13 @@ module.exports = {
         ctx = _ctx;
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
-                user.session = 'news';
                 if (user.session != null && news[message.text] != null) {
                     var handler = news[message.text];
                     handler(message.from, this);
                 } else {
                     sendMessage(message.from, 'Выбирите одину из следующих тем');
                 }
+                user.session = 'news';
                 ctx.dao.saveUserData(user);
             }
         });

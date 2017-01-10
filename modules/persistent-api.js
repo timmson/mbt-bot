@@ -8,7 +8,7 @@ function PersistentApi(ctx) {
 }
 
 PersistentApi.prototype.loadUserData = function (userId, callback) {
-    call(db => db.collection('user').findOne({'id': userId}, callback), callback);
+    call(db => db.collection('user').findOne({'id': userId}, (err, user) => callback(err, !err && !user ? {'id': userId} : user)), callback);
 };
 
 PersistentApi.prototype.saveUserData = function (user, callback) {
