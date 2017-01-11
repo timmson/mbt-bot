@@ -3,6 +3,7 @@ const nmap = require('node-nmap');
 module.exports = {
 
     handle: function (ctx, message, sendMessage) {
+        ctx.log.debug("Network scan is in progress");
         const quickScan = new nmap.nodenmap.QuickScan(ctx.config.network.address);
 
         ctx.dao.loadNetworkState((err, networkState)=> {
