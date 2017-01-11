@@ -12,7 +12,7 @@ PersistentApi.prototype.loadUserData = function (userId, callback) {
 };
 
 PersistentApi.prototype.saveUserData = function (user, callback) {
-    call(db => db.collection('user').updateOne({}, user, {}, callback), callback);
+    call(db => db.collection('user').updateOne({}, user, {upsert:true}, callback), callback);
 };
 
 PersistentApi.prototype.saveMessage = function (message, callback) {
