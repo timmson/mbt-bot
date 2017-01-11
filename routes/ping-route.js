@@ -1,52 +1,55 @@
-var nmap = require('node-nmap');
-
-var subnetHosts = {};
+const nmap = require('node-nmap');
 
 module.exports = {
 
     handle: function (ctx, message, sendMessage) {
-        var quickScan = new nmap.nodenmap.QuickScan(ctx.config.network.address);
+        const quickScan = new nmap.nodenmap.QuickScan(ctx.config.network.address);
 
-        if (Object.keys(subnetHosts).length == 0) {
-            var network = ctx.config.network;
-            subnetHosts = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
-        }
+        ctx.dao.loadNetworkState((err, networkState)=> {
 
-        quickScan.on('complete', function (data) {
-            var onlineHosts = [];
-            data.forEach(function (host) {
-                onlineHosts.push(host.ip);
+            if (err && Object.keys(networkState).length == 0) {
+                let network = ctx.config.network;
+                networkState = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
+            }
+
+            quickScan.on('complete', function (data) {
+                let onlineHosts = [];
+                data.forEach(function (host) {
+                    onlineHosts.push(host.ip);
+                });
+
+                for (let hostIp in networkState) {
+                    let response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
+                    if (!networkState[hostIp] & onlineHosts.indexOf(hostIp) >= 0) {
+                        ctx.log.debug(hostIp + ' is up');
+                        response += ' 👻';
+                        sendMessage(ctx, message.from, response);
+                        networkState[hostIp] = true;
+                    }
+                    if (networkState[hostIp] & onlineHosts.indexOf(hostIp) < 0) {
+                        ctx.log.debug(hostIp + ' is down');
+                        response += ' ☠';
+                        sendMessage(ctx, message.from, response);
+                        networkState[hostIp] = false;
+                    }
+                }
             });
 
-            for (var hostIp in subnetHosts) {
-                var response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
-                if (!subnetHosts[hostIp] & onlineHosts.indexOf(hostIp) >= 0) {
-                    ctx.log.debug(hostIp + ' is up');
-                    response += ' 👻';
-                    sendMessage(ctx, message.from, response);
-                    subnetHosts[hostIp] = true;
-                }
-                if (subnetHosts[hostIp] & onlineHosts.indexOf(hostIp) < 0) {
-                    ctx.log.debug(hostIp + ' is down');
-                    response += ' ☠';
-                    sendMessage(ctx, message.from, response);
-                    subnetHosts[hostIp] = false;
-                }
-            }
-        });
+            quickScan.on('error', function (error) {
+                ctx.log.error(error);
+            });
 
-        quickScan.on('error', function (error) {
-            ctx.log.error(error);
-        });
+            quickScan.startScan();
 
-        quickScan.startScan();
+            ctx.dao.saveNetworkState(networkState);
+        });
     }
 };
 
 function fillSubnetHosts(constPart, startIndex, endIndex, excludedHosts) {
-    var subnetHosts = {}
-    for (var i = startIndex; i <= endIndex; i++) {
-        var host = constPart + i;
+    let subnetHosts = {}
+    for (let i = startIndex; i <= endIndex; i++) {
+        let host = constPart + i;
         if (excludedHosts.indexOf(host) < 0) {
             subnetHosts[host] = false;
         }
