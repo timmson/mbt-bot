@@ -5,6 +5,7 @@
   "main": "bot.js",
   "dependencies": {
     "accounting": "0.4.1",
+    "amqp": "0.2.6",
     "cron": "~1.1.0",
     "feed-read": "^0.0.1",
     "loan-schedule.js": "~0.4.5",

@@ -1,20 +1,20 @@
-var CronJob = require('cron').CronJob;
-var accounting = require('accounting');
+const CronJob = require('cron').CronJob;
+const accounting = require('accounting');
 
-var router = require('./router.js');
-var tco = require('./modules/tco.js');
-var MessageBot = require('./modules/message-api.js');
-var PersistentApi = require('./modules/persistent-api.js');
+const router = require('./router.js');
+const MessageApi = require('./modules/message-api.js');
+const PersistentApi = require('./modules/persistent-api.js');
+const MqApi = require('./modules/mq-api.js');
 
 
-var ctx = {
+let ctx = {
     exec: require('child_process').exec,
     config: require('./config/config.js'),
     commands: require('./config/commands.js'),
     log: require('log4js').getLogger(),
     request: require('request'),
     feed: require('feed-read'),
-    tco: tco,
+    tco: require('./modules/tco.js'),
     toMoney: function (number) {
         return accounting.formatMoney(number, {symbol: 'руб.', format: '%v %s', thousand: ' '});
     }
@@ -23,8 +23,11 @@ var ctx = {
 
 try {
 
-    ctx.bot = new MessageBot(ctx);
+    ctx.bot = new MessageApi(ctx);
     ctx.dao = new PersistentApi(ctx);
+
+    ctx.mq = new MqApi(ctx);
+    ctx.mq.start();
 
     ctx.bot.on('text', function (message) {
         router.handle(ctx, message);
@@ -53,7 +56,7 @@ process.on('SIGINT', function () {
 
 ctx.config.tasks.forEach(function (task) {
     ctx.log.info('Cron [' + task.name + '] has started');
-    var cronMessage = task.message;
+    let cronMessage = task.message;
     new CronJob(task.cron, function () {
             router.handle(ctx, cronMessage);
         },

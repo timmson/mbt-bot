@@ -1,7 +1,7 @@
 module.exports = PersistentApi;
 
 const mongo = require('mongodb');
-var _ctx = null;
+let _ctx = null;
 
 function PersistentApi(ctx) {
     _ctx = ctx;

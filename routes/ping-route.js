@@ -48,7 +48,7 @@ module.exports = {
 };
 
 function fillSubnetHosts(constPart, startIndex, endIndex, excludedHosts) {
-    let subnetHosts = {}
+    let subnetHosts = {};
     for (let i = startIndex; i <= endIndex; i++) {
         let host = constPart + i;
         if (excludedHosts.indexOf(host) < 0) {
