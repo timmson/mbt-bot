@@ -15,8 +15,8 @@ MqApi.prototype.start = function () {
     });
 
     connection.addListener('ready', () => {
-        connection.queue(_ctx.config.mq.generalQueueIn, {'exclusive': true}, queue => {
-            queue.bind('#');
+        connection.queue('', {'exclusive': true}, queue => {
+            queue.bind(_ctx.config.mq.exchange, '#');
             queue.subscribe(message => {
                 _ctx.log.info("Message received " + message);
                 var msg = JSON.parse(message.data.toString());
