@@ -34,6 +34,8 @@ module.exports = {
                         networkState[hostIp] = false;
                     }
                 }
+
+                ctx.dao.saveNetworkState(networkState);
             });
 
             quickScan.on('error', function (error) {
@@ -41,8 +43,6 @@ module.exports = {
             });
 
             quickScan.startScan();
-
-            ctx.dao.saveNetworkState(networkState);
         });
     }
 };
