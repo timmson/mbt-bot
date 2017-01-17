@@ -6,18 +6,21 @@ module.exports = {
         ctx.log.debug("Network scan is in progress");
         const quickScan = new nmap.nodenmap.QuickScan(ctx.config.network.address);
 
-        ctx.dao.loadNetworkState((err, networkState)=> {
+        ctx.dao.loadNetworkState((err, networkState) => {
 
             if (err && Object.keys(networkState).length == 0) {
                 let network = ctx.config.network;
                 networkState = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
+
             }
 
-            quickScan.on('complete', function (data) {
-                let onlineHosts = [];
-                data.forEach(function (host) {
-                    onlineHosts.push(host.ip);
-                });
+            ctx.log.debug("State: ");
+            ctx.log.debug(networkState);
+
+            quickScan.on('complete', (data) => {
+                let onlineHosts = data.map(host => host.ip);
+
+                ctx.log.debug(onlineHosts);
 
                 for (let hostIp in networkState) {
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
