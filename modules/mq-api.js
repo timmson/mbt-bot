@@ -15,7 +15,7 @@ MqApi.prototype.start = function () {
     });
 
     connection.addListener('ready', () => {
-        connection.queue('bot.queue.in', {'exclusive': true}, queue => {
+        connection.queue('bot.queue.in', {}, queue => {
             queue.bind(_ctx.config.mq.exchange, '#');
             queue.subscribe(message => {
                 _ctx.log.info("Message received " + message);
