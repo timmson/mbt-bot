@@ -8,9 +8,9 @@ module.exports = {
 
         ctx.dao.loadNetworkState((err, networkState) => {
 
-            if (err && Object.keys(networkState).length == 0) {
+            if (err || !networkState.hasOwnProperty('hosts') || Object.keys(networkState.hosts).length == 0) {
                 let network = ctx.config.network;
-                networkState = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
+                networkState.hosts = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
 
             }
 
@@ -20,21 +20,19 @@ module.exports = {
             quickScan.on('complete', (data) => {
                 let onlineHosts = data.map(host => host.ip);
 
-                ctx.log.debug(onlineHosts);
-
-                for (let hostIp in networkState) {
+                for (let hostIp in networkState.hosts) {
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
-                    if (!networkState[hostIp] & onlineHosts.indexOf(hostIp) >= 0) {
+                    if (!networkState.hosts[hostIp] & onlineHosts.indexOf(hostIp) >= 0) {
                         ctx.log.debug(hostIp + ' is up');
                         response += ' 👻';
                         sendMessage(ctx, message.from, response);
-                        networkState[hostIp] = true;
+                        networkState.hosts[hostIp] = true;
                     }
-                    if (networkState[hostIp] & onlineHosts.indexOf(hostIp) < 0) {
+                    if (networkState.hosts[hostIp] & onlineHosts.indexOf(hostIp) < 0) {
                         ctx.log.debug(hostIp + ' is down');
                         response += ' ☠';
                         sendMessage(ctx, message.from, response);
-                        networkState[hostIp] = false;
+                        networkState.hosts[hostIp] = false;
                     }
                 }
 
