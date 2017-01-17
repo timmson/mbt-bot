@@ -37,7 +37,7 @@ module.exports = {
 
                 ctx.dao.saveNetworkState(networkState, (err1,res) => {
                     if (err1) {
-                        ctx.log.error(err1);
+                        //ctx.log.error(err1);
                     }
                 });
             });
