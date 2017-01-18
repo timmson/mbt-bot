@@ -16,6 +16,8 @@ module.exports = {
             quickScan.on('complete', (data) => {
                 let onlineHosts = data.map(host => host.ip);
 
+                ctx.log.debug("Alive hosts: " + onlineHosts);
+
                 for (let hostIp in networkState.hosts) {
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
 
