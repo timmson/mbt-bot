@@ -17,7 +17,7 @@ module.exports = {
                 let onlineHosts = data.map(host => host.ip);
 
                 for (let hostIp in networkState.hosts) {
-                    let response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
+                    let response = hostIp + ' ' + (ctx.config.network.knownHosts.includes(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
 
                     if (networkState.hosts.includes(hostIp) != onlineHosts.includes(hostIp)) {
                         if (onlineHosts.includes(hostIp)) {
