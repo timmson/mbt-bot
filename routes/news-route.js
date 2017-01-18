@@ -48,7 +48,7 @@ function getReplyMarkups(news) {
         }
     }
     return JSON.stringify(replyMarkupArray);
-};
+}
 
 function getDemoNews(to) {
     readFeed('http://demotivators.to/feeds/recent/', function (article) {
