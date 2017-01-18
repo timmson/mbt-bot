@@ -29,39 +29,22 @@ try {
     ctx.mq = new MqApi(ctx);
     ctx.mq.start();
 
-    ctx.bot.on('text', function (message) {
-        router.handle(ctx, message);
-    });
-
-    ctx.bot.on('callback_query', function (message) {
-        router.handleCallback(ctx, message);
-    });
-
-    ctx.bot.on('contact', function (message) {
-        log.info(message);
-    });
-
-    ctx.bot.on('document', function (message) {
-        router.handleFile(ctx, message);
-    });
+    ctx.bot.on('text', message => router.handle(ctx, message));
+    ctx.bot.on('callback_query', message => router.handleCallback(ctx, message));
+    ctx.bot.on('contact', message => ctx.log.info(message));
+    ctx.bot.on('document', message => router.handleFile(ctx, message));
 
 } catch (err) {
     ctx.log.error(err.stack);
 }
 
-process.on('SIGINT', function () {
-    ctx.log.info('Bot has stopped');
-    process.exit(0);
-});
 
-ctx.config.tasks.forEach(function (task) {
+ctx.config.tasks.forEach(task => {
     ctx.log.info('Cron [' + task.name + '] has started');
     let cronMessage = task.message;
-    new CronJob(task.cron, function () {
-            router.handle(ctx, cronMessage);
-        },
-        function () {
-
+    new CronJob(task.cron,
+        () =>router.handle(ctx, cronMessage),
+        () => {
         },
         true
     );
@@ -69,3 +52,13 @@ ctx.config.tasks.forEach(function (task) {
 
 ctx.log.info('Bot has started');
 ctx.log.info('Please press [CTRL + C] to stop');
+
+process.on('SIGINT', () => {
+    ctx.log.info('Bot has stopped');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    ctx.log.info('Bot has stopped');
+    process.exit(0);
+});
