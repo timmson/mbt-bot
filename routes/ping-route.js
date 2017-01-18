@@ -33,18 +33,6 @@ module.exports = {
                         }
                     }
 
-                    if (!networkState.hosts[hostIp] && onlineHosts.indexOf(hostIp) >= 0) {
-                        ctx.log.debug(hostIp + ' is up');
-                        response += ' 👻';
-                        sendMessage(ctx, message.from, response);
-                        networkState.hosts[hostIp] = true;
-                    }
-                    if (networkState.hosts[hostIp] && onlineHosts.indexOf(hostIp) < 0) {
-                        ctx.log.debug(hostIp + ' is down');
-                        response += ' ☠';
-                        sendMessage(ctx, message.from, response);
-                        networkState.hosts[hostIp] = false;
-                    }
                 }
 
                 ctx.log.debug("State: ");
