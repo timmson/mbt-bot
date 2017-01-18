@@ -20,7 +20,7 @@ var calculationType = {
 
 
 module.exports = {
-    handle: function (ctx, message) {
+    handle: (ctx, message) => {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 user.session = 'schedule';

@@ -2,7 +2,7 @@ const nmap = require('node-nmap');
 
 module.exports = {
 
-    handle: function (ctx, message, sendMessage) {
+    handle: (ctx, message, sendMessage) => {
         ctx.log.debug("Network scan is in progress");
         const quickScan = new nmap.nodenmap.QuickScan(ctx.config.network.address);
 
@@ -10,7 +10,7 @@ module.exports = {
 
             networkState.hosts = networkState.hasOwnProperty('hosts') ? networkState.hosts : [];
 
-            quickScan.on('complete', (data) => {
+            quickScan.on('complete', data => {
                 let onlineHosts = data.map(host => host.ip);
                 let lastStateHosts = networkState.hosts;
 
@@ -21,7 +21,7 @@ module.exports = {
                     sendMessage(ctx, message.from, getMessage(ctx, hostIp, '👻'));
                 });
 
-                lastStateHosts.filter(hostIp => !onlineHosts.includes(hostIp)).forEach(hostIp=> {
+                lastStateHosts.filter(hostIp => !onlineHosts.includes(hostIp)).forEach(hostIp => {
                     ctx.log.debug(hostIp + ' is up');
                     sendMessage(ctx, message.from, getMessage(ctx, hostIp, '☠'));
                 });
@@ -35,9 +35,7 @@ module.exports = {
                 });
             });
 
-            quickScan.on('error', function (error) {
-                ctx.log.error(error);
-            });
+            quickScan.on('error', error => ctx.log.error(error));
 
             quickScan.startScan();
         });

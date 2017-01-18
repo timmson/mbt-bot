@@ -1,5 +1,5 @@
 module.exports = {
-    handle: function (ctx, message, sendMessage) {
+    handle: (ctx, message, sendMessage) => {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 user = (user == null ? {id: message.from.id} : user);

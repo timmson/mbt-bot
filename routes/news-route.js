@@ -51,7 +51,7 @@ function getReplyMarkups(news) {
 }
 
 function getDemoNews(to) {
-    readFeed('http://demotivators.to/feeds/recent/', function (article) {
+    readFeed('http://demotivators.to/feeds/recent/', article => {
         var imageUrl = article.content.match(/src=.*\.thumbnail/i)[0];
         imageUrl = imageUrl.substr(5, imageUrl.length - 15) + '.jpg';
         sendMessage(to, imageUrl);
@@ -59,25 +59,25 @@ function getDemoNews(to) {
 }
 
 function getAutoNews(to) {
-    readFeed('https://auto.mail.ru/rss/', function (article) {
+    readFeed('https://auto.mail.ru/rss/', article => {
         sendMessage(to, article.link);
     });
 }
 
 function getGadgetsNews(to) {
-    readFeed('http://4pda.ru/feed/', function (article) {
+    readFeed('http://4pda.ru/feed/', article => {
         sendMessage(to, article.link);
     });
 }
 
 function getKinozalNews(to) {
-    readFeed('http://kinozal.me/rss.xml', function (article) {
+    readFeed('http://kinozal.me/rss.xml', article => {
         sendMessage(to, article.link.replace('kinozal.tv', 'kinozal.me'));
     });
 }
 
 function getLinuxNews(to) {
-    readFeed('http://www.linux.org.ru/section-rss.jsp?section=1', function (article) {
+    readFeed('http://www.linux.org.ru/section-rss.jsp?section=1', article => {
         sendMessage(to, article.link);
     });
 }
@@ -87,11 +87,13 @@ function getDevLifeNews(to) {
 }
 
 function readFeed(url, handle) {
-    ctx.feed(url, function (err, articles) {
-        if (err) ctx.log.error(err);
-
-        for (var i = 0; i < 10; i++) {
-            handle(articles[i]);
+    ctx.feed(url, (err, articles) => {
+        if (err) {
+            ctx.log.error(err);
+        } else {
+            for (var i = 0; i < 10; i++) {
+                handle(articles[i]);
+            }
         }
     });
 }

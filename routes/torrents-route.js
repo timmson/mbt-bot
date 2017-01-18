@@ -8,13 +8,13 @@ var options = {
 
 module.exports = {
 
-    handle: function (_ctx, message) {
+    handle: (_ctx, message) => {
         ctx = _ctx;
         options.url = getUrl(ctx.config.network.torrent);
         getTorrentList(message.from);
     },
 
-    handleCallback: function (_ctx, message) {
+    handleCallback: (_ctx, message) => {
         ctx = _ctx;
         options.url = getUrl(ctx.config.network.torrent);
         ctx.bot.editMessageText("Торрент удален", {
@@ -24,15 +24,13 @@ module.exports = {
         removeTorrent(message.from, message.data);
     },
 
-    handleFile: function (_ctx, message) {
+    handleFile: (_ctx, message) => {
         ctx = _ctx;
         options.url = getUrl(ctx.config.network.torrent);
-        ctx.bot.getFileLink(message.document['file_id']).then(function (result) {
-                addTorrent(message.from, result);
-            },
-            function (err) {
-                ctx.log.error(err);
-            });
+        ctx.bot.getFileLink(message.document['file_id']).then(
+            result => addTorrent(message.from, result),
+            err => ctx.log.error(err)
+        );
     }
 };
 
@@ -41,7 +39,7 @@ function sendMessage(to, response) {
 }
 
 function sendTorrentMessage(to, torrent) {
-    var response = torrent['name'] + '\n\n';
+    let response = torrent['name'] + '\n\n';
     response += parseInt(parseFloat(torrent['percentDone']) * 100) + '%' + ' ' + bytesToSize(torrent['sizeWhenDone']);
     ctx.bot.sendMessage(to, response, {
         disable_web_page_preview: true,
@@ -67,7 +65,7 @@ function addTorrent(to, url, sessionId) {
             filename: url
         }
     });
-    ctx.request.post(options, function (error, response, body) {
+    ctx.request.post(options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
             ctx.log.info(body);
             sendMessage(to, "Торрент добавлен");
@@ -90,7 +88,7 @@ function removeTorrent(to, id, sessionId) {
             'delete-local-data': true
         }
     });
-    ctx.request.post(options, function (error, response, body) {
+    ctx.request.post(options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
             ctx.log.info(body);
         } else if (response.statusCode == 409) {
@@ -119,7 +117,7 @@ function getTorrentList(to, sessionId) {
             fields: ['id', 'name', 'status', 'percentDone', 'sizeWhenDone']
         }
     });
-    ctx.request.post(options, function (error, response, body) {
+    ctx.request.post(options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
             ctx.log.info(body);
             var torrentList = JSON.parse(body)['arguments']['torrents'];
