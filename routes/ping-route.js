@@ -8,7 +8,7 @@ module.exports = {
 
         ctx.dao.loadNetworkState((err, networkState) => {
 
-            if (err || !networkState.hasOwnProperty('hosts') || networkState.hosts.length == 0) {
+            if (err || !networkState.hasOwnProperty('hosts')) {
                 ctx.log.debug("Fill hosts");
                 networkState.hosts = [];
             }
@@ -19,22 +19,16 @@ module.exports = {
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
                 for (let hostIp in onlineHosts) {
+
+                    ctx.log.debug("Check: " + hostIp);
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
 
-                    if (networkState.hosts.includes(hostIp) != onlineHosts.includes(hostIp)) {
-                        if (onlineHosts.includes(hostIp)) {
-                            ctx.log.debug(hostIp + ' is up');
-                            response += ' 👻';
-                            sendMessage(ctx, message.from, response);
-                            networkState.hosts.push(hostIp)
-                        } else {
-                            ctx.log.debug(hostIp + ' is down');
-                            response += ' ☠';
-                            sendMessage(ctx, message.from, response);
-                            networkState.hosts = networkState.hosts.splice(networkState.hosts.indexOf(hostIp), 1);
-                        }
+                    if (!networkState.hosts.includes(hostIp)) {
+                        ctx.log.debug(hostIp + ' is up');
+                        response += ' 👻';
+                        sendMessage(ctx, message.from, response);
+                        networkState.hosts.push(hostIp);
                     }
-
                 }
 
                 ctx.log.debug("State: ");
