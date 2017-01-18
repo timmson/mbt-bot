@@ -18,7 +18,7 @@ module.exports = {
 
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
-                for (let hostIp in onlineHosts) {
+                onlineHosts.forEach(hostIp => {
 
                     ctx.log.debug("Check: " + hostIp);
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
@@ -29,7 +29,8 @@ module.exports = {
                         sendMessage(ctx, message.from, response);
                         networkState.hosts.push(hostIp);
                     }
-                }
+
+                });
 
                 ctx.log.debug("State: ");
                 ctx.log.debug(networkState);
