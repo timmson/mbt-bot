@@ -12,24 +12,21 @@ module.exports = {
 
             quickScan.on('complete', (data) => {
                 let onlineHosts = data.map(host => host.ip);
+                let lastStateHosts = networkState.hosts;
 
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
-                onlineHosts.filter(hostIp => !ctx.config.network.skippedHosts.includes(hostIp)).forEach(hostIp => {
-
-                    ctx.log.debug("Check: " + hostIp);
-                    let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
-
-                    if (!networkState.hosts.includes(hostIp)) {
-                        ctx.log.debug(hostIp + ' is up');
-                        response += ' 👻';
-                        sendMessage(ctx, message.from, response);
-                        networkState.hosts.push(hostIp);
-                    }
-
+                onlineHosts.filter(hostIp => !ctx.config.network.skippedHosts.includes(hostIp) && !lastStateHosts.includes(hostIp)).forEach(hostIp => {
+                    ctx.log.debug(hostIp + ' is up');
+                    sendMessage(ctx, message.from, getMessage(ctx, hostIp, '👻'));
                 });
 
-                ctx.log.debug("State:" + networkState);
+                lastStateHosts.filter(hostIp => !onlineHosts.includes(hostIp)).forEach(hostIp=> {
+                    ctx.log.debug(hostIp + ' is up');
+                    sendMessage(ctx, message.from, getMessage(ctx, hostIp, '☠'));
+                });
+
+                networkState.hosts = onlineHosts;
 
                 ctx.dao.saveNetworkState(networkState, (err1, res) => {
                     if (err1) {
@@ -47,14 +44,6 @@ module.exports = {
     }
 };
 
-function fillSubnetHosts(constPart, startIndex, endIndex, excludedHosts) {
-    let subnetHosts = {};
-    for (let i = startIndex; i <= endIndex; i++) {
-        let host = constPart + i;
-        if (excludedHosts.indexOf(host) < 0) {
-            subnetHosts[host] = false;
-        }
-    }
-
-    return hosts;
+function getMessage(ctx, hostIp, sign) {
+    return [hostIp, (ctx.config.network.knownHosts[hostIp] || '<b>?</b>'), sign].join(' ');
 }
