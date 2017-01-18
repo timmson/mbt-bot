@@ -18,7 +18,7 @@ module.exports = {
 
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
-                for (let hostIp in networkState.hosts) {
+                for (let hostIp in onlineHosts) {
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
 
                     if (networkState.hosts.includes(hostIp) != onlineHosts.includes(hostIp)) {
@@ -64,5 +64,6 @@ function fillSubnetHosts(constPart, startIndex, endIndex, excludedHosts) {
             subnetHosts[host] = false;
         }
     }
-    return subnetHosts;
+
+    return hosts;
 }
