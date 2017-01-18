@@ -18,7 +18,7 @@ module.exports = {
 
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
-                onlineHosts.forEach(hostIp => {
+                onlineHosts.filter(hostIp => !ctx.config.network.skippedHosts.includes(hostIp)).forEach(hostIp => {
 
                     ctx.log.debug("Check: " + hostIp);
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts.hasOwnProperty(hostIp) ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
