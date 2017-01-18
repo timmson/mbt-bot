@@ -8,9 +8,9 @@ module.exports = {
 
         ctx.dao.loadNetworkState((err, networkState) => {
 
-            if (err || !networkState.hasOwnProperty('hosts') || Object.keys(networkState.hosts).length == 0) {
-                let network = ctx.config.network;
-                networkState.hosts = fillSubnetHosts(network.fixedPart, network.startIndex, network.endIndex, network.skippedHosts);
+            if (err || !networkState.hasOwnProperty('hosts') || networkState.hosts.length == 0) {
+                ctx.log.debug("Fill hosts");
+                networkState.hosts = [];
             }
 
             quickScan.on('complete', (data) => {
@@ -18,6 +18,21 @@ module.exports = {
 
                 for (let hostIp in networkState.hosts) {
                     let response = hostIp + ' ' + (ctx.config.network.knownHosts[hostIp] != null ? ctx.config.network.knownHosts[hostIp] : '<b>?</b>');
+
+                    if (networkState.hosts.includes(hostIp) != onlineHosts.includes(hostIp)) {
+                        if (onlineHosts.includes(hostIp)) {
+                            ctx.log.debug(hostIp + ' is up');
+                            response += ' 👻';
+                            sendMessage(ctx, message.from, response);
+                            networkState.hosts.push(hostIp)
+                        } else {
+                            ctx.log.debug(hostIp + ' is down');
+                            response += ' ☠';
+                            sendMessage(ctx, message.from, response);
+                            networkState.hosts = networkState.hosts.splice(networkState.hosts.indexOf(hostIp), 1);
+                        }
+                    }
+
                     if (!networkState.hosts[hostIp] && onlineHosts.indexOf(hostIp) >= 0) {
                         ctx.log.debug(hostIp + ' is up');
                         response += ' 👻';
@@ -32,12 +47,12 @@ module.exports = {
                     }
                 }
 
-                //ctx.log.debug("State: ");
-                //ctx.log.debug(networkState);
+                ctx.log.debug("State: ");
+                ctx.log.debug(networkState);
 
-                ctx.dao.saveNetworkState(networkState, (err1,res) => {
+                ctx.dao.saveNetworkState(networkState, (err1, res) => {
                     if (err1) {
-                        //ctx.log.error(err1);
+                        ctx.log.error(err1);
                     }
                 });
             });
