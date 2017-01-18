@@ -8,10 +8,7 @@ module.exports = {
 
         ctx.dao.loadNetworkState((err, networkState) => {
 
-            if (err || !networkState.hasOwnProperty('hosts')) {
-                ctx.log.debug("Fill hosts");
-                networkState.hosts = [];
-            }
+            networkState.hosts = networkState.hasOwnProperty('hosts') ? networkState.hosts : [];
 
             quickScan.on('complete', (data) => {
                 let onlineHosts = data.map(host => host.ip);
@@ -32,8 +29,7 @@ module.exports = {
 
                 });
 
-                ctx.log.debug("State: ");
-                ctx.log.debug(networkState);
+                ctx.log.debug("State:" + networkState);
 
                 ctx.dao.saveNetworkState(networkState, (err1, res) => {
                     if (err1) {
