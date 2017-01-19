@@ -11,12 +11,12 @@ module.exports = {
             networkState.hosts = networkState.hasOwnProperty('hosts') ? networkState.hosts : [];
 
             quickScan.on('complete', data => {
-                let onlineHosts = data.map(host => host.ip);
+                let onlineHosts = data.map(host => host.ip).filter(hostIp => !ctx.config.network.skippedHosts.includes(hostIp));
                 let lastStateHosts = networkState.hosts;
 
                 ctx.log.debug("Alive hosts: " + onlineHosts);
 
-                onlineHosts.filter(hostIp => !ctx.config.network.skippedHosts.includes(hostIp) && !lastStateHosts.includes(hostIp)).forEach(hostIp => {
+                onlineHosts.filter(hostIp => !lastStateHosts.includes(hostIp)).forEach(hostIp => {
                     ctx.log.debug(hostIp + ' is up');
                     sendMessage(ctx, message.from, getMessage(ctx, hostIp, '👻'));
                 });
