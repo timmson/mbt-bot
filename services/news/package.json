@@ -1,0 +1,21 @@
+{
+  "name": "news-service",
+  "version": "0.0.1",
+  "description": "News collector",
+  "main": "service.js",
+  "dependencies": {
+    "amqp": "0.2.6",
+    "cron": "1.2.1",
+    "feed-read": "0.0.1"
+  },
+  "scripts": {
+    "start" : "nodejs service.js"
+  },
+  "keywords": [
+    "timmson",
+    "bot",
+    "node"
+  ],
+  "author": "timmson",
+  "license": "GPL-3.0"
+}
