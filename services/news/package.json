@@ -9,7 +9,8 @@
     "feed-read": "0.0.1"
   },
   "scripts": {
-    "start" : "nodejs service.js"
+    "start" : "node service.js",
+    "test": "node test.js"
   },
   "keywords": [
     "timmson",
