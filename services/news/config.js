@@ -14,6 +14,6 @@ module.exports = {
         password: '{{ mq_password }}',
         exchange: '{{ mq_exchange }}'
     },
-    cron: '0 * 6-22 * * *',
+    cron: '0 * * * * *',
     limit: 10
 };
