@@ -11,26 +11,27 @@ log.info("Service started");
 config.topic.forEach(schedule);
 
 function schedule(topic) {
-    new CronJob(config.cron,
-        () =>getNewFeeds(topic),
-        () => lastStared = new Date(),
-        true
-    );
+    new CronJob({
+        cronTime: config.cron,
+        onTick: getNewFeeds(topic),
+        start: true
+    });
 }
 
 
 function getNewFeeds(topic) {
     log.info("Update topic: " + topic.name);
     main.getFeeds(topic, (err, feeds) =>
-        err ? log.error(err.stack) : feeds.filter(isNew).forEach(feed => sendMessage(topic.channel, feed.link))
+        err ? log.error(err.stack) : feeds.filter(isNew).forEach(feed => postFeed(topic.channel, feed.link))
     );
+    lastStared = new Date();
 }
 
 function isNew(feed) {
     return new Date(feed.published).getTime() >= lastStared.getTime();
 }
 
-function sendMessage(to, message) {
+function postFeed(to, message) {
     log.info(to + " <- " + message);
     /*const connection = AMQP.createConnection(config.mq.connection);
 

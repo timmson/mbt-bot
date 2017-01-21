@@ -1,0 +1,24 @@
+{
+  "name": "net-service",
+  "version": "0.0.1",
+  "description": "Net collector",
+  "main": "service.js",
+  "dependencies": {
+    "amqp": "^0.2.6",
+    "cron": "^1.2.1",
+    "log4js": "^1.1.0",
+    "mongo": "^0.1.0",
+    "node-nmap": "^3.0.3"
+  },
+  "scripts": {
+    "start": "node service.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "timmson",
+    "bot",
+    "node"
+  ],
+  "author": "timmson",
+  "license": "GPL-3.0"
+}
