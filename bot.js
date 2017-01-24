@@ -39,17 +39,6 @@ try {
 }
 
 
-ctx.config.tasks.forEach(task => {
-    ctx.log.info('Cron [' + task.name + '] has started');
-    let cronMessage = task.message;
-    new CronJob(task.cron,
-        () =>router.handle(ctx, cronMessage),
-        () => {
-        },
-        true
-    );
-});
-
 ctx.log.info('Bot has started');
 ctx.log.info('Please press [CTRL + C] to stop');
 
