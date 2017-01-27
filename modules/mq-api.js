@@ -2,7 +2,6 @@ module.exports = MqApi;
 
 const amqp = require('amqp');
 const fs = require('fs');
-const request = require('request');
 let _ctx = null;
 
 function MqApi(ctx) {
@@ -31,8 +30,9 @@ MqApi.prototype.start = function () {
 
 function sendMessage(msg) {
     if (msg.text.endsWith('.jpg')) {
-        let fileName = msg.text.split('/').pop();
-        request(msg.text).pipe(fs.createWriteStream()).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
+        let fileName = '/tmp/' + msg.text.split('/').pop();
+        _ctx.log.debug('Downloading ' + msg.text + ' -> ' + fileName);
+        _ctx.request(msg.text).pipe(fs.createWriteStream()).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
     } else {
         _ctx.bot.sendMessage(msg.to, msg.text)
     }
