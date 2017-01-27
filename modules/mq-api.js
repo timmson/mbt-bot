@@ -32,9 +32,8 @@ function sendMessage(msg) {
     if (msg.text.endsWith('.jpg')) {
         let fileName = '/tmp/' + msg.text.split('/').pop();
         _ctx.log.debug('Downloading ' + msg.text + ' -> ' + fileName);
-        _ctx.request(msg.text).pipe(fs.createWriteStream()).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
+        _ctx.request(msg.text).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
     } else {
         _ctx.bot.sendMessage(msg.to, msg.text)
     }
-    return message
 }
