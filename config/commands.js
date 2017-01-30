@@ -30,22 +30,10 @@ module.exports = {
         'owner' : true
     },
 
-    '🖥 Что на ПК?': {
-        'command': 'screen-pc',
-        'hidden': true,
-        'owner' : true
-    },
-    
     '📺 Что по ТВ?': {
         'command': 'screen-tv',
         'hidden': true,
         'owner' : true
-    },
-
-    '📰 Новости': {
-        'command': 'news',
-        'hidden': false,
-        'owner' : false
     },
 
     '💰 График платежей': {
