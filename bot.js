@@ -5,6 +5,7 @@ const router = require('./router.js');
 const MessageApi = require('./modules/message-api.js');
 const PersistentApi = require('./modules/persistent-api.js');
 const MqApi = require('./modules/mq-api.js');
+const HostSvcApi = require('./modules/host-svc-api');
 
 
 let ctx = {
@@ -27,6 +28,8 @@ try {
 
     ctx.mq = new MqApi(ctx);
     ctx.mq.start();
+
+    ctx.hostSvc = new HostSvcApi(ctx);
 
     ctx.bot.on('text', message => router.handle(ctx, message));
     ctx.bot.on('callback_query', message => router.handleCallback(ctx, message));
