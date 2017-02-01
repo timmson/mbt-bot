@@ -8,7 +8,6 @@ const MqApi = require('./modules/mq-api.js');
 
 
 let ctx = {
-    exec: require('child_process').exec,
     config: require('./config/config.js'),
     commands: require('./config/commands.js'),
     log: require('log4js').getLogger(),

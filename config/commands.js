@@ -36,6 +36,18 @@ module.exports = {
         'owner' : true
     },
 
+    '🖥 Что на ПК?': {
+        'command': 'screen-pc',
+        'hidden': true,
+        'owner' : true
+    },
+
+    '📷 Как обстановка?': {
+        'command': 'camera-pc',
+        'hidden': true,
+        'owner' : true
+    },
+
     '💰 График платежей': {
         'command': 'schedule',
         'hidden': false,
