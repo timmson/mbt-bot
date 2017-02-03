@@ -43,10 +43,18 @@ function sendMessage(msg) {
 }
 
 function sendMessageV2(msg) {
-    if (msg.type == 'image_link') {
-        _ctx.bot.sendPhoto(msg.to, msg.image, {
-            caption: msg.text,
-            reply_markup: JSON.stringify({inline_keyboard: [[{text: 'Open', url: msg.url}]]})
-        });
+    const replyMarkup = JSON.stringify({inline_keyboard: [[{text: '🌍', url: msg.url}]]});
+    switch (msg.type) {
+        case 'link':
+            _ctx.bot.sendMessage(msg.to, msg.text, {
+                reply_markup: replyMarkup
+            });
+            break;
+        case 'image_link':
+            _ctx.bot.sendPhoto(msg.to, msg.image, {
+                caption: msg.text,
+                reply_markup: replyMarkup
+            });
+            break;
     }
 }
