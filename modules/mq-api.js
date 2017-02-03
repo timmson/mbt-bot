@@ -29,11 +29,24 @@ MqApi.prototype.start = function () {
 };
 
 function sendMessage(msg) {
-    if (msg.text.endsWith('.jpg')) {
-        let fileName = '/tmp/' + msg.text.split('/').pop();
-        _ctx.log.debug('Downloading ' + msg.text + ' -> ' + fileName);
-        _ctx.request(msg.text).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
+    if (msg.version && msg.version == '2') {
+        sendMessageV2(msg);
     } else {
-        _ctx.bot.sendMessage(msg.to, msg.text)
+        if (msg.text.endsWith('.jpg')) {
+            let fileName = '/tmp/' + msg.text.split('/').pop();
+            _ctx.log.debug('Downloading ' + msg.text + ' -> ' + fileName);
+            _ctx.request(msg.text).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
+        } else {
+            _ctx.bot.sendMessage(msg.to, msg.text)
+        }
+    }
+}
+
+function sendMessageV2(msg) {
+    if (msg.type == 'image_link') {
+        _ctx.bot.sendPhoto(msg.to, msg.image, {
+            caption: msg.text,
+            reply_markup: JSON.stringify({inline_keyboard: [[{text: 'Open', url: msg.url}]]})
+        });
     }
 }
