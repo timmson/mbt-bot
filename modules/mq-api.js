@@ -47,6 +47,7 @@ function sendMessageV2(msg) {
     switch (msg.type) {
         case 'link':
             _ctx.bot.sendMessage(msg.to, msg.text, {
+                parse_mode: 'HTML',
                 reply_markup: replyMarkup
             });
             break;
