@@ -7,14 +7,6 @@ function PersistentApi(ctx) {
     _ctx = ctx;
 }
 
-PersistentApi.prototype.saveNetworkState = function (networkState, callback) {
-    call(db => db.collection('network-state').updateOne({}, networkState, {upsert:true}, callback), callback);
-};
-
-PersistentApi.prototype.loadNetworkState = function (callback) {
-    call(db => db.collection('network-state').findOne({}, (err, networkState) => callback(err, !err && !networkState ? {} : networkState)), callback);
-};
-
 PersistentApi.prototype.loadUserData = function (userId, callback) {
     call(db => db.collection('user').findOne({'id': userId}, (err, user) => callback(err, !err && !user ? {'id': userId} : user)), callback);
 };

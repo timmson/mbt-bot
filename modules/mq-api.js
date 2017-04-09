@@ -52,10 +52,12 @@ function sendMessageV2(msg) {
             });
             break;
         case 'image_link':
-            _ctx.bot.sendPhoto(msg.to, msg.image, {
+            let fileName = '/tmp/' + msg.image.split('/').pop();
+            _ctx.log.debug('Downloading ' + msg.image + ' -> ' + fileName);
+            _ctx.request(msg.image).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {
                 caption: msg.text,
                 reply_markup: replyMarkup
-            });
+            }));
             break;
     }
 }
