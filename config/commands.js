@@ -72,6 +72,18 @@ module.exports = {
         'owner' : true
     },
 
+    '🔌 MS CTRL': {
+        'command': 'msa',
+        'hidden': false,
+        'owner' : true
+    },
+
+    '📜 Список': {
+        'command': 'msa',
+        'hidden': true,
+        'owner' : true
+    },
+
     '🏢 Квартиры': {
         'command': 'cian',
         'hidden': true,

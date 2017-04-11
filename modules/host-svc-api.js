@@ -21,3 +21,35 @@ HostSvcApi.prototype.downloadPicture = function (path, to) {
     }
 };
 
+HostSvcApi.prototype.msaApi = function (path, to) {
+    const hostSvc = ctx.config.network.hostSvc;
+    const apiUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
+    try {
+        ctx.request(apiUrl, (err, response, body) => {
+            if (err) {
+                throw(err);
+            }
+            JSON.parse(body).forEach(item => ctx.bot.sendMessage(to, item.name + " " + (item.state == 'running' ? '☀' : '🌩'), {
+                disable_web_page_preview: true,
+                reply_markup: JSON.stringify({
+                    inline_keyboard: [
+                        [
+                            {
+                                text: item.state == 'running' ? '⏹ Остановить' : '⏯ Запустить',
+                                callback_data: item.name
+                            },
+                            {
+                                text: '🔄 Обновить',
+                                callback_data: item.name
+                            }
+                        ]
+                    ]
+                })
+            }));
+        });
+    } catch (err) {
+        ctx.log.error(err);
+        ctx.bot.sendMessage(to, 'Service is unavailable', {});
+    }
+};
+
