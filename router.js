@@ -4,11 +4,11 @@ module.exports = {
         if (isAuth(ctx, message.from.id)) {
             ctx.dao.loadUserData(message.from.id, (err, user) => {
                 if (!err) {
-                    var routeName = (message.text == '/start') ? 'start' : (ctx.commands[message.text] == null) ? null : ctx.commands[message.text].command;
+                    let routeName = (message.text == '/start') ? 'start' : (ctx.commands[message.text] == null) ? null : ctx.commands[message.text].command;
                     routeName = user != null && user.session != null && routeName == null ? user.session : routeName;
                     if (routeName != null) {
                         try {
-                            var route = require('./routes/' + routeName + '-route.js');
+                            let route = require('./routes/' + routeName + '-route.js');
                             route.handle(ctx, message, this.sendBasicMessage);
                         } catch (err) {
                             ctx.log.error(err);
@@ -24,9 +24,9 @@ module.exports = {
     handleCallback: function (ctx, message) {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
-                var routeName = user != null && user.session != null ? user.session : 'tco';
+                let routeName = user != null && user.session != null ? user.session : 'tco';
                 try {
-                    var route = require('./routes/' + routeName + '-route.js');
+                    let route = require('./routes/' + routeName + '-route.js');
                     route.handleCallback(ctx, message);
                 } catch (err) {
                     ctx.log.error(err);
@@ -37,7 +37,7 @@ module.exports = {
 
     handleFile: function (ctx, message) {
         if ((message.document['mime_type'] === 'application/x-bittorrent') && (isOwner(ctx, message.from.id))) {
-            var torrentRoute = require('./routes/torrents-route.js');
+            let torrentRoute = require('./routes/torrents-route.js');
             torrentRoute.handleFile(ctx, message);
         }
     },
@@ -58,9 +58,9 @@ function isOwner(ctx, userId) {
 }
 
 function getReplyMarkups(ctx, userId) {
-    var replyMarkupArray = {keyboard: [[]], resize_keyboard: true};
-    var i = 0, j = 0, columnCount = 2;
-    for (var key in ctx.commands) {
+    let replyMarkupArray = {keyboard: [[]], resize_keyboard: true};
+    let i = 0, j = 0, columnCount = 2;
+    for (let key in ctx.commands) {
         if (!ctx.commands[key].hidden && (isOwner(ctx, userId) || !ctx.commands[key].owner)) {
             replyMarkupArray.keyboard[i].push(key);
             j = (j < columnCount - 1) ? j + 1 : 0;

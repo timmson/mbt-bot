@@ -1,12 +1,24 @@
-
-
 module.exports = {
     handle: function (ctx, message) {
-        if (message.text == '📜 Список') {
-            ctx.hostSvc.msaApi('/msa/list.json', message.from);
-        } else {
-            sendMessage(ctx, message.from, 'Выбирите одину из следующих тем')
-        }
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                if (user.session != null) {
+                    switch (message.text) {
+                        case '📜 Список':
+                            ctx.hostSvc.msaApi('/msa/list.json', message.from);
+                            break;
+                    }
+                } else {
+                    user.session = 'msa';
+                    sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
+                }
+                ctx.dao.saveUserData(user);
+            }
+        });
+    },
+
+    handleCallback: function (ctx, message) {
+        sendMessage(ctx, message.from, 'Комманда пока не поддерживается');
     }
 };
 
