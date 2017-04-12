@@ -17,7 +17,8 @@ module.exports = {
                     }
                 } else {
                     user.session = 'msa';
-                    sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
+                    //sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
+                    ctx.hostSvc.msaApi('/msa/list.json', message.from, parseListBody);
                 }
                 ctx.dao.saveUserData(user);
             }
