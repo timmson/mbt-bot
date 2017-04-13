@@ -17,8 +17,8 @@ module.exports = {
                     }
                 } else {
                     user.session = 'msa';
-                    //sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
-                    ctx.hostSvc.msaApi('/msa/list.json', message.from, parseListBody);
+                    sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
+                    //ctx.hostSvc.msaApi('/msa/list.json', message.from, parseListBody);
                 }
                 ctx.dao.saveUserData(user);
             }
@@ -26,10 +26,12 @@ module.exports = {
     },
 
     handleCallback: function (ctx, message) {
-        ctx.hostSvc.msaApi(message.data, message.from, () => {
-            ctx.bot.editMessageText('Запрос выполнен', {
+        ctx.hostSvc.msaApi(message.data, message.from, (err, body, ctx, to) => {
+            let item = JSON.parse(body).map(getMessageForItem)[0];
+            ctx.bot.editMessageText(item.text, {
                 message_id: message.message.message_id,
-                chat_id: message.message.chat.id
+                chat_id: message.message.chat.id,
+                reply_markup: item.reply_markup
             });
         });
     }
@@ -54,25 +56,22 @@ function parseListBody(err, body, ctx, to) {
     if (err) {
         ctx.bot.sendMessage(to, 'Сервис не доступен', {});
     } else {
-        JSON.parse(body).map(getMessageForItem).forEach(item => ctx.bot.sendMessage(to, item.text, item.params));
+        JSON.parse(body).map(getMessageForItem).forEach(item => ctx.bot.sendMessage(to, item.text, {reply_markup: item.reply_markup}));
     }
 }
 
 function getMessageForItem(item) {
     return {
         text: item.name + " " + (item.state == 'running' ? '☀' : '🌩'),
-        params: {
-            disable_web_page_preview: true,
-            reply_markup: JSON.stringify({
-                inline_keyboard: [
-                    item.actions.map(action => {
-                        return {
-                            text: buttonNames[action.name],
-                            callback_data: action.url
-                        }
-                    })
-                ]
-            })
-        }
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                item.actions.map(action => {
+                    return {
+                        text: buttonNames[action.name],
+                        callback_data: action.url
+                    }
+                })
+            ]
+        })
     }
 }
