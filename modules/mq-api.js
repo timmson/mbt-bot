@@ -21,7 +21,11 @@ MqApi.prototype.start = function () {
             queue.subscribe(message => {
                 let msg = JSON.parse(message.data.toString());
                 _ctx.log.info("Message received: " + msg.to.id + " <= " + msg.text);
-                sendMessage(msg);
+                try {
+                    sendMessage(msg);
+                } catch (err) {
+                    _ctx.log.error("Error " + err);
+                }
             });
         });
 
