@@ -37,9 +37,7 @@ function sendMessage(msg) {
         sendMessageV2(msg);
     } else {
         if (msg.text.endsWith('.jpg')) {
-            let fileName = '/tmp/' + msg.text.split('/').pop();
-            _ctx.log.debug('Downloading ' + msg.text + ' -> ' + fileName);
-            _ctx.request(msg.text).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {}));
+            sendImage(msg.text, msg.to, {})
         } else {
             _ctx.bot.sendMessage(msg.to, msg.text)
         }
@@ -56,12 +54,20 @@ function sendMessageV2(msg) {
             });
             break;
         case 'image_link':
-            let fileName = '/tmp/' + msg.image.split('/').pop();
-            _ctx.log.debug('Downloading ' + msg.image + ' -> ' + fileName);
-            _ctx.request(msg.image).pipe(fs.createWriteStream(fileName)).on('close', () => _ctx.bot.sendPhoto(msg.to, fileName, {
+            sendImage(msg.image, msg.to, {
                 caption: msg.text,
                 reply_markup: replyMarkup
-            }));
+            });
             break;
     }
+}
+
+function sendImage(imageUrl, to, options) {
+    let fileName = '/tmp/' + imageUrl.split('/').pop();
+    _ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
+    let fileStream = fs.createWriteStream(fileName);
+    fileStream.on('error', (err) => {
+        _ctx.log.error('Unable to save ' + imageUrl + ':' + err);
+    });
+    _ctx.request(imageUrl).pipe(fileStream).on('close', () => _ctx.bot.sendPhoto(to, fileName, options));
 }
