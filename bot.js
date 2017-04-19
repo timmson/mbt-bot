@@ -26,8 +26,8 @@ try {
     ctx.bot = new MessageApi(ctx);
     ctx.dao = new PersistentApi(ctx);
 
-    ctx.mq = new MqApi(ctx);
-    ctx.mq.start();
+    //ctx.mq = new MqApi(ctx);
+    //ctx.mq.start();
 
     ctx.hostSvc = new HostSvcApi(ctx);
 
