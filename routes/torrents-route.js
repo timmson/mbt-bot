@@ -10,13 +10,13 @@ module.exports = {
 
     handle: (_ctx, message) => {
         ctx = _ctx;
-        options.url = getUrl(ctx.config.network.torrent);
+        options.url = getUrl(ctx.config.torrent);
         getTorrentList(message.from);
     },
 
     handleCallback: (_ctx, message) => {
         ctx = _ctx;
-        options.url = getUrl(ctx.config.network.torrent);
+        options.url = getUrl(ctx.config.torrent);
         ctx.bot.editMessageText("Торрент удален", {
             message_id: message.message.message_id,
             chat_id: message.message.chat.id
@@ -26,7 +26,7 @@ module.exports = {
 
     handleFile: (_ctx, message) => {
         ctx = _ctx;
-        options.url = getUrl(ctx.config.network.torrent);
+        options.url = getUrl(ctx.config.torrent);
         ctx.bot.getFileLink(message.document['file_id']).then(
             result => addTorrent(message.from, result),
             err => ctx.log.error(err)

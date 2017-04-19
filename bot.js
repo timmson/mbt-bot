@@ -1,10 +1,8 @@
-const CronJob = require('cron').CronJob;
 const accounting = require('accounting');
 
 const router = require('./router.js');
 const MessageApi = require('./modules/message-api.js');
 const PersistentApi = require('./modules/persistent-api.js');
-const MqApi = require('./modules/mq-api.js');
 const HostSvcApi = require('./modules/host-svc-api');
 
 
@@ -13,7 +11,6 @@ let ctx = {
     commands: require('./config/commands.js'),
     log: require('log4js').getLogger(),
     request: require('request'),
-    feed: require('feed-read'),
     tco: require('./modules/tco.js'),
     toMoney: function (number) {
         return accounting.formatMoney(number, {symbol: 'руб.', format: '%v %s', thousand: ' '});
@@ -25,10 +22,6 @@ try {
 
     ctx.bot = new MessageApi(ctx);
     ctx.dao = new PersistentApi(ctx);
-
-    //ctx.mq = new MqApi(ctx);
-    //ctx.mq.start();
-
     ctx.hostSvc = new HostSvcApi(ctx);
 
     ctx.bot.on('text', message => router.handle(ctx, message));

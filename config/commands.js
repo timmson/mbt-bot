@@ -24,12 +24,6 @@ module.exports = {
         'owner' : true
     },
 
-    '🏡 Кто дома?': {
-        'command': 'whois',
-        'hidden': true,
-        'owner' : true
-    },
-
     '📺 Что по ТВ?': {
         'command': 'screen-tv',
         'hidden': true,

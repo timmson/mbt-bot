@@ -9,7 +9,7 @@ function HostSvcApi(_ctx) {
 }
 
 HostSvcApi.prototype.downloadPicture = function (path, to) {
-    const hostSvc = ctx.config.network.hostSvc;
+    const hostSvc = ctx.config.hostSvc;
     const imageUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
     const fileName = '/tmp/' + imageUrl.split('/').pop();
     ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
@@ -22,7 +22,7 @@ HostSvcApi.prototype.downloadPicture = function (path, to) {
 };
 
 HostSvcApi.prototype.msaApi = function (path, to, callback) {
-    const hostSvc = ctx.config.network.hostSvc;
+    const hostSvc = ctx.config.hostSvc;
     const apiUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
     try {
         ctx.log.info('Calling ' + apiUrl);
