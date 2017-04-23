@@ -62,7 +62,7 @@ function parseListBody(err, body, ctx, to) {
 
 function getMessageForItem(item) {
     return {
-        text: item.name + " " + (item.state == 'running' ? '☀' : '🌩'),
+        text: item.name + ' ' + (item.state == 'running' ? '☀' : '🌩') + ' [' + item.status.toLowerCase()+']',
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 item.actions.map(action => {
