@@ -1,11 +1,5 @@
 let ctx = null;
 
-let options = {
-    headers: {
-        'Content-Type': 'application/json'
-    }
-};
-
 module.exports = {
 
     handle: (_ctx, message) => {
@@ -17,7 +11,7 @@ module.exports = {
             }
         });
 
-        ctx.hostSvc.torrentApi('/torrent/list.json', message.from, (err, body, ctx, to) => {
+        ctx.hostSvc.torrentApi('list.json', message.from, (err, body, ctx, to) => {
             err ? sendMessage(to, 'Сервис не доступен', {}) : JSON.parse(body).forEach(torrent => sendTorrentMessage(to, torrent));
         });
 
@@ -25,7 +19,7 @@ module.exports = {
 
     handleCallback: (_ctx, message) => {
         ctx = _ctx;
-        ctx.hostSvc.torrentApi('/torrent/remove?id=' + message.data, (err, body, ctx, to) => {
+        ctx.hostSvc.torrentApi('remove?id=' + message.data, (err, body, ctx, to) => {
             if (!err && body == "OK") {
                 ctx.bot.editMessageText("Торрент удален", {
                     message_id: message.message.message_id,
@@ -37,9 +31,10 @@ module.exports = {
 
     handleFile: (_ctx, message) => {
         ctx = _ctx;
-        options.url = getUrl(ctx.config.torrent);
         ctx.bot.getFileLink(message.document['file_id']).then(
-            result => addTorrent(message.from, result),
+            result => ctx.hostSvc.torrentApi('add?id=' + result, (err, body, ctx, to) => {
+                sendMessage(to, !err && body == "OK" ? "Торрент добавлен" : "Ошибка;(");
+            }),
             err => ctx.log.error(err)
         );
     }
@@ -64,34 +59,4 @@ function sendTorrentMessage(to, torrent) {
             ]
         })
     });
-}
-
-
-function addTorrent(to, url, sessionId) {
-    options.headers['X-Transmission-Session-Id'] = sessionId;
-    options = addBody(options, {
-        method: 'torrent-add',
-        arguments: {
-            filename: url
-        }
-    });
-    ctx.request.post(options, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
-            ctx.log.info(body);
-            sendMessage(to, "Торрент добавлен");
-        } else if (response.statusCode == 409) {
-            addTorrent(to, url, response.headers['x-transmission-session-id']);
-        } else {
-            ctx.log.error(error);
-            ctx.log.error(body);
-        }
-    });
-
-}
-
-
-function addBody(options, body) {
-    options.body = JSON.stringify(body);
-    options.headers['Content-Length'] = options.body.length;
-    return options
 }
