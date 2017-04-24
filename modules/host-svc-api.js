@@ -34,3 +34,16 @@ HostSvcApi.prototype.msaApi = function (path, to, callback) {
     }
 };
 
+HostSvcApi.prototype.torrentApi = function (path, to, callback) {
+    const hostSvc = ctx.config.hostSvc;
+    const apiUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
+    try {
+        ctx.log.info('Calling ' + apiUrl);
+        ctx.request(apiUrl, (err, response, body) => {
+            callback(err, body, ctx, to);
+        });
+    } catch (err) {
+        callback(err, null, ctx, to)
+    }
+};
+

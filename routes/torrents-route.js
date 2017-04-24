@@ -1,6 +1,6 @@
-var ctx = null;
+let ctx = null;
 
-var options = {
+let options = {
     headers: {
         'Content-Type': 'application/json'
     }
@@ -8,10 +8,18 @@ var options = {
 
 module.exports = {
 
-    handle: (_ctx, message) => {
-        ctx = _ctx;
-        options.url = getUrl(ctx.config.torrent);
-        getTorrentList(message.from);
+    handle: (ctx, message) => {
+        ctx.dao.loadUserData(message.from.id, (err, user) => {
+            if (!err) {
+                user.session = 'torrents';
+                ctx.dao.saveUserData(user);
+            }
+        });
+
+        ctx.hostSvc.torrentApi('/torrent/list.json', message.from, (err, body, ctx, to) => {
+            err ? sendMessage(to, 'Сервис не доступен', {}) : JSON.parse(body).forEach(torrent => sendTorrentMessage(to, torrent));
+        });
+
     },
 
     handleCallback: (_ctx, message) => {
@@ -101,52 +109,8 @@ function removeTorrent(to, id, sessionId) {
 
 }
 
-function getTorrentList(to, sessionId) {
-
-    ctx.dao.loadUserData(to.id, (err, user) => {
-        if (!err) {
-            user.session = 'torrents';
-            ctx.dao.saveUserData(user);
-        }
-    });
-
-    options.headers['X-Transmission-Session-Id'] = sessionId;
-    options = addBody(options, {
-        method: 'torrent-get',
-        arguments: {
-            fields: ['id', 'name', 'status', 'percentDone', 'sizeWhenDone']
-        }
-    });
-    ctx.request.post(options, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
-            ctx.log.info(body);
-            var torrentList = JSON.parse(body)['arguments']['torrents'];
-            for (var i = 0; i < torrentList.length; i++) {
-                sendTorrentMessage(to, torrentList[i]);
-            }
-        } else if (response.statusCode == 409) {
-            getTorrentList(to, response.headers['x-transmission-session-id']);
-        } else {
-            ctx.log.error(error);
-            ctx.log.error(body);
-        }
-    });
-}
-
 function addBody(options, body) {
     options.body = JSON.stringify(body);
     options.headers['Content-Length'] = options.body.length;
     return options
-}
-
-function bytesToSize(bytes) {
-    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (bytes == 0) return 'n/a';
-    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-    if (i == 0) return bytes + ' ' + sizes[i];
-    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
-}
-
-function getUrl(torrent) {
-    return 'http://' + torrent.host + ':' + torrent.port + '/transmission/rpc';
 }
