@@ -8,7 +8,8 @@ let options = {
 
 module.exports = {
 
-    handle: (ctx, message) => {
+    handle: (_ctx, message) => {
+        ctx = _ctx;
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 user.session = 'torrents';
