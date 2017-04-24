@@ -47,8 +47,7 @@ function sendMessage(to, response) {
 }
 
 function sendTorrentMessage(to, torrent) {
-    let response = torrent['name'] + '\n\n';
-    response += parseInt(parseFloat(torrent['percentDone']) * 100) + '%' + ' ' + bytesToSize(torrent['sizeWhenDone']);
+    let response = torrent['name'] + '\n\n' + torrent['percentDone']+ ' ' + torrent['sizeWhenDone'];
     ctx.bot.sendMessage(to, response, {
         disable_web_page_preview: true,
         reply_markup: JSON.stringify({
