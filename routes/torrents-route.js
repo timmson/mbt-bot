@@ -25,12 +25,14 @@ module.exports = {
 
     handleCallback: (_ctx, message) => {
         ctx = _ctx;
-        options.url = getUrl(ctx.config.torrent);
-        ctx.bot.editMessageText("Торрент удален", {
-            message_id: message.message.message_id,
-            chat_id: message.message.chat.id
+        ctx.hostSvc.torrentApi('/torrent/remove?id=' + message.data, (err, body, ctx, to) => {
+            if (!err && body == "OK") {
+                ctx.bot.editMessageText("Торрент удален", {
+                    message_id: message.message.message_id,
+                    chat_id: message.message.chat.id
+                });
+            }
         });
-        removeTorrent(message.from, message.data);
     },
 
     handleFile: (_ctx, message) => {
@@ -48,7 +50,7 @@ function sendMessage(to, response) {
 }
 
 function sendTorrentMessage(to, torrent) {
-    let response = torrent['name'] + '\n\n' + torrent['percentDone']+ ' ' + torrent['sizeWhenDone'];
+    let response = torrent['name'] + '\n\n' + torrent['percentDone'] + ' ' + torrent['sizeWhenDone'];
     ctx.bot.sendMessage(to, response, {
         disable_web_page_preview: true,
         reply_markup: JSON.stringify({
@@ -87,27 +89,6 @@ function addTorrent(to, url, sessionId) {
 
 }
 
-function removeTorrent(to, id, sessionId) {
-    options.headers['X-Transmission-Session-Id'] = sessionId;
-    options = addBody(options, {
-        method: 'torrent-remove',
-        arguments: {
-            ids: [parseInt(id)],
-            'delete-local-data': true
-        }
-    });
-    ctx.request.post(options, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
-            ctx.log.info(body);
-        } else if (response.statusCode == 409) {
-            removeTorrent(to, id, response.headers['x-transmission-session-id']);
-        } else {
-            ctx.log.error(error);
-            ctx.log.error(body);
-        }
-    });
-
-}
 
 function addBody(options, body) {
     options.body = JSON.stringify(body);

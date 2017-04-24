@@ -12,13 +12,12 @@ module.exports = {
                 if (user.session != null) {
                     switch (message.text) {
                         case '📜 Список':
-                            ctx.hostSvc.msaApi('/msa/list.json', message.from, parseListBody);
+                            ctx.hostSvc.msaApi('list.json', message.from, parseListBody);
                             break;
                     }
                 } else {
                     user.session = 'msa';
                     sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
-                    //ctx.hostSvc.msaApi('/msa/list.json', message.from, parseListBody);
                 }
                 ctx.dao.saveUserData(user);
             }
