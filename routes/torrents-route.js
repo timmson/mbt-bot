@@ -19,7 +19,7 @@ module.exports = {
 
     handleCallback: (_ctx, message) => {
         ctx = _ctx;
-        ctx.hostSvc.torrentApi('remove?id=' + message.data, (err, body, ctx, to) => {
+        ctx.hostSvc.torrentApi('remove?id=' + message.data, message.from, (err, body, ctx, to) => {
             if (!err && body == "OK") {
                 ctx.bot.editMessageText("Торрент удален", {
                     message_id: message.message.message_id,
@@ -32,7 +32,7 @@ module.exports = {
     handleFile: (_ctx, message) => {
         ctx = _ctx;
         ctx.bot.getFileLink(message.document['file_id']).then(
-            result => ctx.hostSvc.torrentApi('add?id=' + result, (err, body, ctx, to) => {
+            result => ctx.hostSvc.torrentApi('add?id=' + result, message.from, (err, body, ctx, to) => {
                 sendMessage(to, !err && body == "OK" ? "Торрент добавлен" : "Ошибка;(");
             }),
             err => ctx.log.error(err)
