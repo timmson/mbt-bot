@@ -6,7 +6,7 @@ const buttonNames = {
 };
 
 module.exports = {
-    handle: (ctx, message) =>
+    handle: (ctx, message) => {}/*
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 if (user.session != null) {
@@ -28,7 +28,7 @@ module.exports = {
                 }
                 ctx.dao.saveUserData(user);
             }
-        })
+        })*/
     ,
 
     handleCallback: function (ctx, message) {
