@@ -14,6 +14,13 @@ module.exports = {
                         case '📜 Список':
                             ctx.hostSvc.msaApi('list.json', message.from, parseListBody);
                             break;
+                        case '💡 Информаиця':
+                            ctx.hostSvc.api('system.json'.message.from, (err, body, ctx, to) => {
+                                const data = JSON.parse(body);
+                                let text  = data.memory.active + " " + data.load.avgload;
+                                ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
+                            });
+                            break;
                     }
                 } else {
                     user.session = 'msa';
@@ -43,7 +50,7 @@ function sendMessage(ctx, to, response) {
             parse_mode: 'HTML',
             reply_markup: {
                 keyboard: [
-                    ['📜 Список'],
+                    ['📜 Список', '💡 Информаиця'],
                     ['⬅️ Отмена']
                 ],
                 resize_keyboard: true
@@ -61,7 +68,7 @@ function parseListBody(err, body, ctx, to) {
 
 function getMessageForItem(item) {
     return {
-        text: item.name + ' ' + (item.state == 'running' ? '☀' : '🌩') + ' [' + item.status.toLowerCase()+']',
+        text: item.name + ' ' + (item.state == 'running' ? '☀' : '🌩') + ' [' + item.status.toLowerCase() + ']',
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 item.actions.map(action => {

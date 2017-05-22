@@ -25,6 +25,8 @@ HostSvcApi.prototype.msaApi = (command, to, callback) => api('/msa/' + command, 
 
 HostSvcApi.prototype.torrentApi = (command, to, callback) => api('/torrent/' + command, to, callback);
 
+HostSvcApi.prototype.api = (command, to, callback) => api('/' + command, to , callback);
+
 function api(path, to, callback) {
     const hostSvc = ctx.config.hostSvc;
     const apiUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
