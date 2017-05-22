@@ -15,7 +15,7 @@ module.exports = {
                             ctx.hostSvc.msaApi('list.json', message.from, parseListBody);
                             break;
                         case '💡 Информаиця':
-                            ctx.hostSvc.api('system.json'.message.from, (err, body, ctx, to) => {
+                            ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
                                 let text = data.memory.active + " " + data.load.avgload;
                                 ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
