@@ -6,8 +6,7 @@ const buttonNames = {
 };
 
 module.exports = {
-    handle: function (ctx, message) {
-        return;
+    handle: (ctx, message) => {}/*
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 if (user.session != null) {
@@ -18,7 +17,7 @@ module.exports = {
                         case '💡 Информаиця':
                             ctx.hostSvc.api('system.json'.message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
-                                let text  = data.memory.active + " " + data.load.avgload;
+                                let text = data.memory.active + " " + data.load.avgload;
                                 ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
                             });
                             break;
@@ -29,8 +28,8 @@ module.exports = {
                 }
                 ctx.dao.saveUserData(user);
             }
-        });
-    },
+        })*/
+    ,
 
     handleCallback: function (ctx, message) {
         ctx.hostSvc.msaApi(message.data, message.from, (err, body, ctx, to) => {
