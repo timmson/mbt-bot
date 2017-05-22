@@ -18,7 +18,7 @@ module.exports = {
                             ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
                                 let text = '📈 ' + (data.load.avgload*100) + '%\n';
-                                text += '🌡 ' + data.sensors.main + '\n'
+                                text += '🌡 ' + data.sensors.main + ' Cel\n'
                                 text += '📊 ' + data.memory.active + ' of ' + data.memory.total + '\n';
                                 text += '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
                                 ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
