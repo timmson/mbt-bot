@@ -7,6 +7,7 @@ const buttonNames = {
 
 module.exports = {
     handle: function (ctx, message) {
+        return;
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (!err) {
                 if (user.session != null) {
