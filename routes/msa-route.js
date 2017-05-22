@@ -17,10 +17,10 @@ module.exports = {
                         case '💡 Информаиця':
                             ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
-                                let text = '<b>CPU</b>: ' + data.load.avgload + '\n';
-                                text += '<b>Temp</b>:' + data.sensors.main + '\n'
-                                text += '<b>RAM</b>: ' + data.memory.active + ' of ' + data.memory.total + '\n';
-                                text += '<b>ROM</b>: ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
+                                let text = '📈 ' + (data.load.avgload*100) + '%\n';
+                                text += '🌡 ' + data.sensors.main + '\n'
+                                text += '📊 ' + data.memory.active + ' of ' + data.memory.total + '\n';
+                                text += '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
                                 ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
                             });
                             break;
