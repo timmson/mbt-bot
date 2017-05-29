@@ -21,6 +21,7 @@ module.exports = {
                                 text += '🌡 ' + data.sensors.main + ' Cel\n'
                                 text += '📊 ' + data.memory.active + ' of ' + data.memory.total + '\n';
                                 text += '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
+                                text += '🔮 ' + data.network.rx + '/' + data.network.rx;
                                 ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
                             });
                             break;
