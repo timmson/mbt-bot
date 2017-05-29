@@ -14,7 +14,7 @@ module.exports = {
                         case '📜 Список':
                             ctx.hostSvc.msaApi('list.json', message.from, parseListBody);
                             break;
-                        case '💡 Информаиця':
+                        case '💡 Информация':
                             ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
                                 let text = '📈 ' + (data.load.avgload*100) + '%\n';
@@ -53,7 +53,7 @@ function sendMessage(ctx, to, response) {
             parse_mode: 'HTML',
             reply_markup: {
                 keyboard: [
-                    ['📜 Список', '💡 Информаиця'],
+                    ['📜 Список', '💡 Информация'],
                     ['⬅️ Отмена']
                 ],
                 resize_keyboard: true
