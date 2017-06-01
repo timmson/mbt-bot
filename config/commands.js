@@ -11,8 +11,8 @@ module.exports = {
         'owner' : false
     },
 
-    '📡 Пинг': {
-        'command': 'ping',
+    '🚸 Кто дома?': {
+        'command': 'whois',
         'hidden': true,
         'owner' : true
     },
