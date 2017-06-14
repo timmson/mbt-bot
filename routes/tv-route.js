@@ -4,13 +4,11 @@ const commandMap = {
     '🔉': 'volume-down',
     '◀️': 'channel-down',
     '🔴': 'power-off',
-    '▶️': 'channel-up',
-    '🏞': 'screen'
+    '▶️': 'channel-up'
 };
 
 
 module.exports = {
-    //handle: (ctx, message, sendMessage) => ctx.hostSvc.downloadPicture('/tv/screen', message.from)
     handle: (ctx, message) => {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (user.session != null) {
@@ -18,6 +16,8 @@ module.exports = {
                     ctx.hostSvc.tvApi(commandMap[message.text], message.from, (err, body, ctx, to) => {
                         sendMessage(ctx, to, err ? err.toString() : '🆗');
                     });
+                } else if (message.text == '🏞') {
+                    ctx.hostSvc.downloadPicture('/tv/screen', message.from);
                 } else {
                     sendMessage(ctx, message.from, 'Непонятная команда: ' + message.text);
                 }

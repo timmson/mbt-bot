@@ -17,7 +17,7 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
         ctx.request(imageUrl).pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
     } catch (err) {
         ctx.log.error(err);
-        ctx.bot.sendMessage(to, 'Service is unavailable', {});
+        ctx.bot.sendMessage(to, err.toString(), {});
     }
 };
 
