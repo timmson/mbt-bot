@@ -14,6 +14,12 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
     const fileName = '/tmp/' + imageUrl.split('/').pop();
     ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
     try {
+        ctx.request(imageUrl).pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
+    } catch (err) {
+        ctx.log.error(err);
+        ctx.bot.sendMessage(to, 'Service is unavailable', {});
+    }
+/*    try {
         ctx.request(imageUrl, (err, response, body) => {
             if (response.statusCode != 200) {
                 ctx.log.error(body);
@@ -25,7 +31,7 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
     } catch (err) {
         ctx.log.error(err);
         ctx.bot.sendMessage(to, err.toString(), {});
-    }
+    }*/
 };
 
 HostSvcApi.prototype.msaApi = (command, to, callback) => api('/msa/' + command, to, callback);
