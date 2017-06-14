@@ -1,9 +1,27 @@
+const commandMap = {
+    '🔊' : 'volume-up',
+    '🔇': 'mute',
+    '🔉': 'volume-down',
+    '◀️': 'channel-down',
+    '🔴': 'power-off',
+    '▶️': 'channel-up',
+    '🏞': 'screen'
+};
+
+
 module.exports = {
     //handle: (ctx, message, sendMessage) => ctx.hostSvc.downloadPicture('/tv/screen', message.from)
     handle: (ctx, message) => {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (user.session != null) {
-                sendMessage(ctx, message.from, 'Ваше сообщение:' + message.text);
+                if (commandMap.hasOwnProperty(message.text)) {
+                    ctx.hostSvc.tvApi(commandMap[message.text], message.from, (err, body, ctx, to) => {
+                        sendMessage(ctx, to, err ? '🆗' : err.toString());
+                    });
+                } else {
+                    sendMessage(ctx, message.from, 'Непонятная команда: ' + message.text);
+                }
+
             } else {
                 user.session = 'tv';
                 sendMessage(ctx, message.from, 'Пуль управления');
@@ -21,7 +39,7 @@ function sendMessage(ctx, to, response) {
                 keyboard: [
                     ['🔊', '🔇', '🔉'],
                     ['◀️', '🔴', '▶️'],
-                    ['⬅️ Отмена', '🏞']
+                    ['🏡 Умный дом', '🏞']
                 ],
                 resize_keyboard: true
             }
