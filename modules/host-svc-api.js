@@ -14,10 +14,10 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
     const fileName = '/tmp/' + imageUrl.split('/').pop();
     ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
     try {
-        ctx.request(imageUrl).on('response', (response) => {
+        ctx.request(imageUrl, (err, response, body) => {
             if (response.statusCode != 200) {
-                ctx.log.error(response);
-                ctx.bot.sendMessage(to, response.body, {});
+                ctx.log.error(body);
+                ctx.bot.sendMessage(to, body, {});
             }
             response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
         });
