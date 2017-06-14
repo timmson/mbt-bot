@@ -3,10 +3,10 @@ module.exports = {
     handle: (ctx, message) => {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (user.session != null) {
-                ctx.sendMessage(ctx, message.from, 'Ваше сообщение:' + message.text);
+                sendMessage(ctx, message.from, 'Ваше сообщение:' + message.text);
             } else {
                 user.session = 'tv';
-                ctx.sendMessage(ctx, message.from, 'Выберите одну из следующих тем');
+                sendMessage(ctx, message.from, 'Выберите одну из следующих тем');
             }
         });
     }
