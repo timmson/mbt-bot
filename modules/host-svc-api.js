@@ -18,8 +18,9 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
             if (response.statusCode != 200) {
                 ctx.log.error(body);
                 ctx.bot.sendMessage(to, body, {});
+            } else {
+                response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
             }
-            response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
         });
     } catch (err) {
         ctx.log.error(err);
