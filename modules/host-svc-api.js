@@ -35,7 +35,9 @@ function api(path, to, callback) {
     try {
         ctx.log.info('Calling ' + apiUrl);
         ctx.request(apiUrl, (err, response, body) => {
-            console.log(response);
+            if (response.statusCode != 200) {
+                err = new Error(body);
+            }
             callback(err, body, ctx, to);
         });
     } catch (err) {
