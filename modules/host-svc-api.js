@@ -19,7 +19,7 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
                 ctx.log.error(body);
                 ctx.bot.sendMessage(to, body, {});
             } else {
-                response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
+                response.pipe(fs.createWriteStream(fileName)).on('end', () => ctx.bot.sendPhoto(to, fileName, {}));
             }
         });
     } catch (err) {
