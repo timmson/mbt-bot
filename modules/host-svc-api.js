@@ -16,7 +16,7 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
     try {
         ctx.request(imageUrl).on('response', (response) => {
             if (response.statusCode != 200) {
-                ctx.log.error(response.body);
+                ctx.log.error(response);
                 ctx.bot.sendMessage(to, response.body, {});
             }
             response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
