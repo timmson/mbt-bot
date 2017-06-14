@@ -16,7 +16,7 @@ module.exports = {
             if (user.session != null) {
                 if (commandMap.hasOwnProperty(message.text)) {
                     ctx.hostSvc.tvApi(commandMap[message.text], message.from, (err, body, ctx, to) => {
-                        sendMessage(ctx, to, err ? '🆗' : err.toString());
+                        sendMessage(ctx, to, err ? err.toString() : '🆗');
                     });
                 } else {
                     sendMessage(ctx, message.from, 'Непонятная команда: ' + message.text);

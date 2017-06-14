@@ -35,6 +35,7 @@ function api(path, to, callback) {
     try {
         ctx.log.info('Calling ' + apiUrl);
         ctx.request(apiUrl, (err, response, body) => {
+            console.log(response);
             callback(err, body, ctx, to);
         });
     } catch (err) {
