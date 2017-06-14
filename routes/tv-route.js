@@ -6,8 +6,9 @@ module.exports = {
                 sendMessage(ctx, message.from, 'Ваше сообщение:' + message.text);
             } else {
                 user.session = 'tv';
-                sendMessage(ctx, message.from, 'Выберите одну из следующих тем');
+                sendMessage(ctx, message.from, 'Пуль управления');
             }
+            ctx.dao.saveUserData(user);
         });
     }
 };
