@@ -14,7 +14,12 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
     const fileName = '/tmp/' + imageUrl.split('/').pop();
     ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
     try {
-        ctx.request(imageUrl).pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
+        ctx.request(imageUrl).on('response', (response) => {
+            if (response.statusCode != 200) {
+                throw new Error(response.body);
+            }
+            response.pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
+        });
     } catch (err) {
         ctx.log.error(err);
         ctx.bot.sendMessage(to, err.toString(), {});
@@ -27,7 +32,7 @@ HostSvcApi.prototype.tvApi = (command, to, callback) => api('/tv/' + command, to
 
 HostSvcApi.prototype.torrentApi = (command, to, callback) => api('/torrent/' + command, to, callback);
 
-HostSvcApi.prototype.api = (command, to, callback) => api('/' + command, to , callback);
+HostSvcApi.prototype.api = (command, to, callback) => api('/' + command, to, callback);
 
 function api(path, to, callback) {
     const hostSvc = ctx.config.hostSvc;
