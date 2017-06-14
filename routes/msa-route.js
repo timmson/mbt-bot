@@ -28,7 +28,7 @@ module.exports = {
                     }
                 } else {
                     user.session = 'msa';
-                    sendMessage(ctx, message.from, 'Выбирите одину из следующих тем');
+                    sendMessage(ctx, message.from, 'Выберите одну из следующих тем');
                 }
                 ctx.dao.saveUserData(user);
             }

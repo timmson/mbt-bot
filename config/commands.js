@@ -24,8 +24,8 @@ module.exports = {
         'owner' : true
     },
 
-    '📺 Что по ТВ?': {
-        'command': 'screen-tv',
+    '📺 ТВ-пульт': {
+        'command': 'tv',
         'hidden': true,
         'owner' : true
     },
