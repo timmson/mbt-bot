@@ -17,8 +17,17 @@ module.exports = {
                         case '💡 Информация':
                             ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
                                 const data = JSON.parse(body);
-                                let text = '📈 ' + (data.load.avgload*100) + '%\n';
-                                text += '🌡 ' + data.sensors.main + ' ℃\n'
+                                let info = [
+                                    '📈 ' + (data.load.avgload * 100) + '% (' + data.process.reduce((last, row) =>
+                                        last + ' ' + row.command.split(' ')[0].split('/').slice(-1)[0], '').trim() + ')',
+                                    '🌡 ' + data.sensors.main + ' ℃',
+                                    '📊 ' + data.memory.active + ' of ' + data.memory.total,
+                                    '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size,
+                                    '🔮 ' + data.network.rx + '/' + data.network.tx
+                                ];
+                                let text = '📈 ' + (data.load.avgload * 100) + '%\n';
+                                text += '🌡 ' + data.sensors.main + ' ℃\n';
+
                                 text += '📊 ' + data.memory.active + ' of ' + data.memory.total + '\n';
                                 text += '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
                                 text += '🔮 ' + data.network.rx + '/' + data.network.tx;
