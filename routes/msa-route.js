@@ -25,13 +25,7 @@ module.exports = {
                                     '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size,
                                     '🔮 ' + data.network.rx + '/' + data.network.tx
                                 ];
-                                let text = '📈 ' + (data.load.avgload * 100) + '%\n';
-                                text += '🌡 ' + data.sensors.main + ' ℃\n';
-
-                                text += '📊 ' + data.memory.active + ' of ' + data.memory.total + '\n';
-                                text += '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size + '\n';
-                                text += '🔮 ' + data.network.rx + '/' + data.network.tx;
-                                ctx.bot.sendMessage(to, text, {parse_mode: 'HTML'});
+                                ctx.bot.sendMessage(to, info.join('\n'), {parse_mode: 'HTML'});
                             });
                             break;
                     }
