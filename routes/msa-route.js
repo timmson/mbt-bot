@@ -20,7 +20,7 @@ module.exports = {
                                 let info = [
                                     '📈 ' + (data.load.avgload * 100) + '% (' + data.process.reduce((last, row) =>
                                         last + ' ' + row.command.split(' ')[0].split('/').slice(-1)[0], '').trim() + ')',
-                                    '🌡 ' + data.sensors.main + ' ℃',
+                                    '🌡 ' + data.sensors.main + ' ℃/' + data.sensors.outer+ ' ℃',
                                     '📊 ' + data.memory.active + ' of ' + data.memory.total,
                                     '💾 ' + data.storage[0].used + ' of ' + data.storage[0].size,
                                     '🔮 ' + data.network.rx + '/' + data.network.tx
