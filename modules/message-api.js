@@ -38,7 +38,7 @@ MessageApi.prototype.sendMessage = function (to, messageText, params) {
         parameters: params,
         date: Date.now() / 1000 | 0
     });
-    MessageApi.super_.prototype.sendMessage.call(this, to.id, messageText, params);
+    return MessageApi.super_.prototype.sendMessage.call(this, to.id, messageText, params);
 };
 
 MessageApi.prototype.sendPhoto = function (to, imageName, params) {
@@ -49,6 +49,6 @@ MessageApi.prototype.sendPhoto = function (to, imageName, params) {
         parameters: params,
         date: Date.now() / 1000 | 0
     });
-    MessageApi.super_.prototype.sendPhoto.call(this, to.id, imageName, params);
+    return MessageApi.super_.prototype.sendPhoto.call(this, to.id, imageName, params);
 };
 

@@ -9,29 +9,11 @@ function HostSvcApi(_ctx) {
 }
 
 HostSvcApi.prototype.downloadPicture = (path, to) => {
-    const hostSvc = ctx.config.hostSvc;
-    const imageUrl = 'http://' + hostSvc.host + ':' + hostSvc.port + path;
-    const fileName = '/tmp/' + imageUrl.split('/').pop();
-    ctx.log.debug('Downloading ' + imageUrl + ' -> ' + fileName);
-    try {
-        ctx.request(imageUrl).pipe(fs.createWriteStream(fileName)).on('close', () => ctx.bot.sendPhoto(to, fileName, {}));
-    } catch (err) {
-        ctx.log.error(err);
-        ctx.bot.sendMessage(to, 'Service is unavailable', {});
-    }
-/*    try {
-        ctx.request(imageUrl, (err, response, body) => {
-            if (response.statusCode != 200) {
-                ctx.log.error(body);
-                ctx.bot.sendMessage(to, body, {});
-            } else {
-                response.pipe(fs.createWriteStream(fileName)).on('end', () => ctx.bot.sendPhoto(to, fileName, {}));
-            }
-        });
-    } catch (err) {
-        ctx.log.error(err);
+    const imageUrl = 'http://' + ctx.config.hostSvc.host + ':' + ctx.config.hostSvc.port + path;
+    ctx.log.debug('Sending ' + imageUrl);
+    ctx.bot.sendPhoto(to, ctx.request(imageUrl), {}).then(ok => {}, err => {
         ctx.bot.sendMessage(to, err.toString(), {});
-    }*/
+    });
 };
 
 HostSvcApi.prototype.msaApi = (command, to, callback) => api('/msa/' + command, to, callback);
