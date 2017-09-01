@@ -18,7 +18,7 @@ HostSvcApi.prototype.downloadPicture = (path, to) => {
 
 HostSvcApi.prototype.msaApi = (command, to, callback) => api('/msa/' + command, to, callback);
 
-HostSvcApi.prototype.tvApi = (command, to, callback) => api('/tv/' + command, to, callback);
+HostSvcApi.prototype.tvApi = (tvName, command, to, callback) => api('/tv/' + tvName +'/' + command, to, callback);
 
 HostSvcApi.prototype.torrentApi = (command, to, callback) => api('/torrent/' + command, to, callback);
 

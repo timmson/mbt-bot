@@ -13,11 +13,11 @@ module.exports = {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (user.session != null) {
                 if (commandMap.hasOwnProperty(message.text)) {
-                    ctx.hostSvc.tvApi(commandMap[message.text], message.from, (err, body, ctx, to) => {
+                    ctx.hostSvc.tvApi('lg42-pc', commandMap[message.text], message.from, (err, body, ctx, to) => {
                         sendMessage(ctx, to, err ? err.toString() : '🆗');
                     });
                 } else if (message.text == '🏞') {
-                    ctx.hostSvc.downloadPicture('/tv/screen', message.from);
+                    ctx.hostSvc.downloadPicture('/tv/lg42-pc/screen', message.from);
                 } else {
                     sendMessage(ctx, message.from, 'Непонятная команда: ' + message.text);
                 }
