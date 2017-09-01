@@ -1,21 +1,17 @@
 {
   "name": "bot-node",
-  "version": "0.8.5",
+  "version": "0.9.5",
   "description": "Private bot",
   "main": "bot.js",
   "dependencies": {
-    "accounting": "0.4.1",
-    "amqp": "0.2.6",
-    "feed-read": "^0.0.1",
-    "loan-schedule.js": "~0.4.5",
     "log4js": "^0.6.38",
-    "mongodb": "2.2.16",
-    "node-telegram-bot-api": "^0.23.3",
-    "request": "2.79.0"
+    "node-telegram-bot-api": "0.28.0",
+    "request": "2.79.0",
+    "request-promise": "4.2.1"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "nodejs bot.js",
+    "start": "nodejs servic.js",
     "test": "nodejs test.js"
   },
   "repository": {

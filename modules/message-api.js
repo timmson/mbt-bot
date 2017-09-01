@@ -1,54 +1,49 @@
-module.exports = MessageApi;
+const log = require('log4js').getLogger('message-api');
+const request = require('request');
+const TelegramBotApi = require('node-telegram-bot-api');
 
-var TelegramBot = require('node-telegram-bot-api');
-var _ctx = null;
 
-MessageApi.super_ = TelegramBot;
-
-MessageApi.prototype = Object.create(TelegramBot.prototype, {
-    constructor: {
-        value: MessageApi,
-        enumerable: false
-    }
-});
-
-function MessageApi(ctx) {
-    _ctx = ctx;
-    MessageApi.super_.apply(this, [
-        _ctx.config.message.token,
-        _ctx.config.message.params
-    ]);
+function MessageApi(config) {
+    this.bot = new TelegramBotApi(config.token, config.params);
+    this.ownerId = config.owner;
 }
 
-MessageApi.prototype.on = function (type, callback) {
-    MessageApi.super_.prototype.on.call(this, type, (message) => {
-        var _message = message;
-        _message.text = (type == 'text' ? _message.text : '[type:' + type + ']');
-        _ctx.log.info(message.from.username + ' -> ' + _message.text);
-        _ctx.dao.saveMessage(_message);
-        callback(message);
-    });
+MessageApi.prototype.isOwner = function (id) {
+    return this.ownerId === id;
 };
 
-MessageApi.prototype.sendMessage = function (to, messageText, params) {
-    _ctx.log.info(to.username + ' <- ' + messageText);
-    _ctx.dao.saveMessage({
-        to: to,
-        text: messageText,
-        parameters: params,
-        date: Date.now() / 1000 | 0
-    });
-    return MessageApi.super_.prototype.sendMessage.call(this, to.id, messageText, params);
+MessageApi.prototype.on = function (name, handler) {
+    return this.bot.on(name, message => log.info(message.from.username + ' -> ' + message.text) & handler(message));
 };
 
-MessageApi.prototype.sendPhoto = function (to, imageName, params) {
-    _ctx.log.info(to.username + ' <- [type:image]');
-    _ctx.dao.saveMessage({
-        to: to,
-        text: '[type:image]',
-        parameters: params,
-        date: Date.now() / 1000 | 0
-    });
-    return MessageApi.super_.prototype.sendPhoto.call(this, to.id, imageName, params);
+MessageApi.prototype.onText = function (regexp, handler) {
+    return this.bot.onText(regexp, (message, match) => log.info(message.from.username + ' -> ' + message.text) & handler(message, match));
 };
 
+MessageApi.prototype.sendText = function (to, text, params) {
+    log.info(to.username + ' <- ' + '[text:' + text + ']');
+    return this.bot.sendMessage(to.id, text, params);
+};
+
+MessageApi.prototype.sendPhoto = function (to, photoUrl, params) {
+    log.info(to.username + ' <- ' + '[image:' + photoUrl + ']');
+    return this.bot.sendPhoto(to.id, request(photoUrl), params);
+};
+
+MessageApi.prototype.sendVideo = function (to, videoUrl, params) {
+    log.info(to.username + ' <- ' + '[video:' + videoUrl + ']');
+    return this.bot.sendVideo(to.id, request(videoUrl), params);
+};
+
+MessageApi.prototype.sendDocument = function (to, documentUrl, params) {
+    log.info(to.username + ' <- ' + '[file:' + documentUrl + ']');
+    return this.bot.sendDocument(to.id, request(documentUrl), params);
+};
+
+MessageApi.prototype.answerCallbackQuery = function (to, messageId, text) {
+    log.info(to.username + ' <- ' + '[callback_query:' + text + ']');
+    return this.bot.answerCallbackQuery(messageId, text, false);
+};
+
+
+module.exports = MessageApi;

@@ -1,9 +1,4 @@
-const buttonNames = {
-    'start': '⏯ Запустить',
-    'stop': '⏹ Остановить',
-    'restart': '🔄 Перезапустить',
-    'update': '↗️Обновить'
-};
+
 
 module.exports = {
     handle: (ctx, message) =>
@@ -12,7 +7,7 @@ module.exports = {
                 if (user.session != null) {
                     switch (message.text) {
                         case '📜 Список':
-                            ctx.hostSvc.msaApi('list.json', message.from, parseListBody);
+
                             break;
                         case '💡 Информация':
                             ctx.hostSvc.api('system.json', message.from, (err, body, ctx, to) => {
@@ -63,28 +58,4 @@ function sendMessage(ctx, to, response) {
                 resize_keyboard: true
             }
         });
-}
-
-function parseListBody(err, body, ctx, to) {
-    if (err) {
-        ctx.bot.sendMessage(to, 'Сервис не доступен', {});
-    } else {
-        JSON.parse(body).map(getMessageForItem).forEach(item => ctx.bot.sendMessage(to, item.text, {reply_markup: item.reply_markup}));
-    }
-}
-
-function getMessageForItem(item) {
-    return {
-        text: item.name + ' ' + (item.state == 'running' ? '☀' : '🌩') + ' [' + item.status.toLowerCase() + ']',
-        reply_markup: JSON.stringify({
-            inline_keyboard: [
-                item.actions.map(action => {
-                    return {
-                        text: buttonNames[action.name],
-                        callback_data: action.url
-                    }
-                })
-            ]
-        })
-    }
 }

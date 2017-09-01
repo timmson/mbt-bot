@@ -5,4 +5,4 @@ npm-debug.log
 log
 
 #Private config
-config/config.js
+config.js
