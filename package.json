@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "nodejs servic.js",
+    "start": "nodejs service.js",
     "test": "nodejs test.js"
   },
   "repository": {
