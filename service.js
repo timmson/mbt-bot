@@ -78,8 +78,8 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case '/tv42':
-            //messageApi.sendText(to, '-----==== Press any button ====-----',
-            messageApi.sendPhoto(to, hostSvcApi.downloadPicture('tv/lg42-pc/screen'),
+            messageApi.sendText(to, '-----==== Press any button ====-----',
+            //messageApi.sendPhoto(to, hostSvcApi.downloadPicture('tv/lg42-pc/screen'),
                 {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
