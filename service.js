@@ -63,15 +63,29 @@ messageApi.onText(/\/.+/, (message) => {
                 }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
             break;
 
-        case '/tv42':
+        case '/tv28':
             messageApi.sendText(to, '-----==== Press any button ====-----',
                 //messageApi.sendPhoto(to, hostSvcApi.downloadPicture('tv/tv42-pc/screen'),
                 {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: '🔇', callback_data: 'tv/tv42-pc/mute'}, {text: '🔴', callback_data: 'tv/tv42-pc/power-off'}],
-                            [{text: '🔊', callback_data: 'tv/tv42-pc/volume-up'}, {text: '🔼', callback_data: 'tv/tv42-pc/channel-up'}],
-                            [{text: '🔉', callback_data: 'tv/tv42-pc/volume-down'}, {text: '🔽', callback_data: 'tv/tv42-pc/channel-down'}]
+                            [{text: '🔇', callback_data: 'tv/lg28-pc/mute'}, {text: '🔴', callback_data: 'tv/lg28-pc/power-off'}],
+                            [{text: '🔊', callback_data: 'tv/lg28-pc/volume-up'}, {text: '🔼', callback_data: 'tv/lg28-pc/channel-up'}],
+                            [{text: '🔉', callback_data: 'tv/lg28-pc/volume-down'}, {text: '🔽', callback_data: 'tv/lg28-pc/channel-down'}]
+                        ]
+                    })
+                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+            break;
+
+        case '/tv42':
+            //messageApi.sendText(to, '-----==== Press any button ====-----',
+            messageApi.sendPhoto(to, hostSvcApi.downloadPicture('tv/lg42-pc/screen'),
+                {
+                    reply_markup: JSON.stringify({
+                        inline_keyboard: [
+                            [{text: '🔇', callback_data: 'tv/lg42-pc/mute'}, {text: '🔴', callback_data: 'tv/lg42-pc/power-off'}],
+                            [{text: '🔊', callback_data: 'tv/lg42-pc/volume-up'}, {text: '🔼', callback_data: 'tv/lg42-pc/channel-up'}],
+                            [{text: '🔉', callback_data: 'tv/lg42-pc/volume-down'}, {text: '🔽', callback_data: 'tv/lg42-pc/channel-down'}]
                         ]
                     })
                 }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
@@ -88,9 +102,9 @@ messageApi.onText(/\/.+/, (message) => {
 });
 
 messageApi.on('callback_query', (message) =>
-    hostSvcApi.api(message.data).then(
-        () => messageApi.answerCallbackQuery({callback_query_id: message.id, text: '🆗'}),
-        err => messageApi.answerCallbackQuery({callback_query_id: message.id, text: '⛔️' + err.toString()})
+    log.info(message) & hostSvcApi.api(message.data).then(
+    () => messageApi.answerCallbackQuery({callback_query_id: message.id, text: '🆗'}),
+    err => messageApi.answerCallbackQuery({callback_query_id: message.id, text: '⛔️' + err.toString()})
     )
 );
 

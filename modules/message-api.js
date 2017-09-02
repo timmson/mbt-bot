@@ -40,9 +40,9 @@ MessageApi.prototype.sendDocument = function (to, documentUrl, params) {
     return this.bot.sendDocument(to.id, request(documentUrl), params);
 };
 
-MessageApi.prototype.answerCallbackQuery = function (to, messageId, text) {
-    log.info(to.username + ' <- ' + '[callback_query:' + text + ']');
-    return this.bot.answerCallbackQuery(messageId, text, false);
+MessageApi.prototype.answerCallbackQuery = function (options) {
+    log.info(options.callback_query_id + ' <- ' + '[callback_query:' + options.toString() + ']');
+    return this.bot.answerCallbackQuery(options);
 };
 
 
