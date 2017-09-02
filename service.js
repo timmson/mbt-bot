@@ -57,7 +57,7 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case '/services' :
-            hostSvcApi.msaApi('list.json').then(
+            hostSvcApi.msaApi('list').then(
                 body => {
                     JSON.parse(body).map(getMessageForItem).forEach(item => messageApi.sendText(to, item.text, {reply_markup: item.reply_markup}));
                 }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
@@ -69,9 +69,9 @@ messageApi.onText(/\/.+/, (message) => {
                 {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: '🔇', callback_data: 'tv/tv42/mute'}, {text: '🔴', callback_data: 'tv/tv42/power-off'}],
-                            [{text: '🔊', callback_data: 'tv/tv42/volume-up'}, {text: '🔼', callback_data: 'tv/tv42/channel-up'}],
-                            [{text: '🔉', callback_data: 'tv/tv42/volume-down'}, {text: '🔽', callback_data: 'tv/tv42/channel-down'}]
+                            [{text: '🔇', callback_data: 'tv/tv42-pc/mute'}, {text: '🔴', callback_data: 'tv/tv42-pc/power-off'}],
+                            [{text: '🔊', callback_data: 'tv/tv42-pc/volume-up'}, {text: '🔼', callback_data: 'tv/tv42-pc/channel-up'}],
+                            [{text: '🔉', callback_data: 'tv/tv42-pc/volume-down'}, {text: '🔽', callback_data: 'tv/tv42-pc/channel-down'}]
                         ]
                     })
                 }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
