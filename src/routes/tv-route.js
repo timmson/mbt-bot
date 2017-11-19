@@ -1,10 +1,10 @@
 const commandMap = {
-    '🔊' : 'volume-up',
-    '🔇': 'mute',
-    '🔉': 'volume-down',
-    '◀️': 'channel-down',
-    '🔴': 'power-off',
-    '▶️': 'channel-up'
+    "🔊" : "volume-up",
+    "🔇": "mute",
+    "🔉": "volume-down",
+    "◀️": "channel-down",
+    "🔴": "power-off",
+    "▶️": "channel-up"
 };
 
 
@@ -13,18 +13,18 @@ module.exports = {
         ctx.dao.loadUserData(message.from.id, (err, user) => {
             if (user.session != null) {
                 if (commandMap.hasOwnProperty(message.text)) {
-                    ctx.hostSvc.tvApi('lg42-pc', commandMap[message.text], message.from, (err, body, ctx, to) => {
-                        sendMessage(ctx, to, err ? err.toString() : '🆗');
+                    ctx.hostSvc.tvApi("lg42-pc", commandMap[message.text], message.from, (err, body, ctx, to) => {
+                        sendMessage(ctx, to, err ? err.toString() : "🆗");
                     });
-                } else if (message.text == '🏞') {
-                    ctx.hostSvc.downloadPicture('/tv/lg42-pc/screen', message.from);
+                } else if (message.text == "🏞") {
+                    ctx.hostSvc.downloadPicture("/tv/lg42-pc/screen", message.from);
                 } else {
-                    sendMessage(ctx, message.from, 'Непонятная команда: ' + message.text);
+                    sendMessage(ctx, message.from, "Непонятная команда: " + message.text);
                 }
 
             } else {
-                user.session = 'tv';
-                sendMessage(ctx, message.from, 'Пуль управления');
+                user.session = "tv";
+                sendMessage(ctx, message.from, "Пуль управления");
             }
             ctx.dao.saveUserData(user);
         });
@@ -34,12 +34,12 @@ module.exports = {
 function sendMessage(ctx, to, response) {
     ctx.bot.sendMessage(to, response,
         {
-            parse_mode: 'HTML',
+            parse_mode: "HTML",
             reply_markup: {
                 keyboard: [
-                    ['🔊', '🔇', '🔉'],
-                    ['◀️', '🔴', '▶️'],
-                    ['🏡 Умный дом', '🏞']
+                    ["🔊", "🔇", "🔉"],
+                    ["◀️", "🔴", "▶️"],
+                    ["🏡 Умный дом", "🏞"]
                 ],
                 resize_keyboard: true
             }

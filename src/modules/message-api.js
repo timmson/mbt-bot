@@ -40,6 +40,11 @@ MessageApi.prototype.sendDocument = function (to, documentUrl, params) {
     return this.bot.sendDocument(to.id, request(documentUrl), params);
 };
 
+MessageApi.prototype.editMessageText = function (text, options) {
+    log.info(options.message_id + ' <- ' + '[edit_message:' + options.toString() + ']');
+    return this.bot.editMessageText(text, options);
+};
+
 MessageApi.prototype.answerCallbackQuery = function (options) {
     log.info(options.callback_query_id + ' <- ' + '[callback_query:' + options.toString() + ']');
     return this.bot.answerCallbackQuery(options);
