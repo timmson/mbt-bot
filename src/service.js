@@ -23,15 +23,15 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case "/photo" :
-            messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/camera.jpg", {});
+            messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/system/camera.jpg", {});
             break;
 
         case "/screen" :
-            messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/screen.jpg", {});
+            messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/system/screen.jpg", {});
             break;
 
         case "/system" :
-            hostSvcApi.api("system.json").then(
+            hostSvcApi.api("system/info").then(
                 body => {
                     const data = JSON.parse(body);
                     let info = [
@@ -48,7 +48,7 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case "/net" :
-            hostSvcApi.api("net.json").then(
+            hostSvcApi.api("system/net").then(
                 body => {
                     const data = JSON.parse(body);
                     const text = data.reduce((last, current) => last + "\n" + current.ip + " " + (current.description !== "?" ? current.description : current.mac), "");
@@ -63,9 +63,15 @@ messageApi.onText(/\/.+/, (message) => {
                 }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
             break;
 
+        case "/wake-pc" :
+            hostSvcApi.api("system/wakePC").then(
+                () => {
+                    messageApi.sendText(to, "OK");
+                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+            break;
+
         case "/tv28":
             messageApi.sendText(to, "-----==== Press any button ====-----",
-                //messageApi.sendPhoto(to, hostSvcApi.downloadPicture("tv/tv42-pc/screen"),
                 {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
@@ -80,29 +86,6 @@ messageApi.onText(/\/.+/, (message) => {
                             [{text: "🔉", callback_data: "tv/lg28-pc/volume-down"}, {
                                 text: "🔽",
                                 callback_data: "tv/lg28-pc/channel-down"
-                            }]
-                        ]
-                    })
-                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
-            break;
-
-        case "/tv42":
-            messageApi.sendText(to, "-----==== Press any button ====-----",
-                //messageApi.sendPhoto(to, hostSvcApi.downloadPicture("tv/lg42-pc/screen"),
-                {
-                    reply_markup: JSON.stringify({
-                        inline_keyboard: [
-                            [{text: "🔇", callback_data: "tv/lg42-pc/mute"}, {
-                                text: "🔴",
-                                callback_data: "tv/lg42-pc/power-off"
-                            }],
-                            [{text: "🔊", callback_data: "tv/lg42-pc/volume-up"}, {
-                                text: "🔼",
-                                callback_data: "tv/lg42-pc/channel-up"
-                            }],
-                            [{text: "🔉", callback_data: "tv/lg42-pc/volume-down"}, {
-                                text: "🔽",
-                                callback_data: "tv/lg42-pc/channel-down"
                             }]
                         ]
                     })
