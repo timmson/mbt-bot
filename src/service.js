@@ -109,7 +109,7 @@ messageApi.onText(/\/.+/, (message) => {
     }
 });
 
-messageApi.on("callback_query", (message) => {
+messageApi.on("callback_query", message => {
         hostSvcApi.api(message.data).then(
             (body) => {
                 if (message.data.startsWith("msa")) {
@@ -119,7 +119,8 @@ messageApi.on("callback_query", (message) => {
                         chat_id: message.message.chat.id,
                         reply_markup: item.reply_markup
                     });
-                } if (message.data.startsWith("torrent")) {
+                }
+                if (message.data.startsWith("torrent")) {
                     messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
                     torrentList(message.from);
                 } else {
@@ -130,6 +131,19 @@ messageApi.on("callback_query", (message) => {
         )
     }
 );
+
+messageApi.on("document", async message => {
+    console.log(message);
+    try {
+        let url = await messageApi.getFileLink(message.document.file_id);
+        await hostSvcApi.torrentApi("add?id=" + url);
+        await messageApi.sendText(message.from, "Ok");
+    } catch (err) {
+        log.error(err);
+        messageApi.sendText(message.from, err.toString());
+
+    }
+});
 
 log.info("Bot has started");
 log.info("Please press [CTRL + C] to stop");

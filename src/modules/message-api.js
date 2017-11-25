@@ -50,5 +50,10 @@ MessageApi.prototype.answerCallbackQuery = function (options) {
     return this.bot.answerCallbackQuery(options);
 };
 
+MessageApi.prototype.getFileLink = function (fileId) {
+    log.info(fileId + ' <- ' + '[get_file_link]');
+    return this.bot.getFileLink(fileId);
+};
+
 
 module.exports = MessageApi;
