@@ -31,7 +31,7 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case "/system" :
-            hostSvcApi.api("system/info").then(
+            hostSvcApi.systemApi("info").then(
                 body => {
                     const data = JSON.parse(body);
                     let info = [
@@ -44,38 +44,45 @@ messageApi.onText(/\/.+/, (message) => {
                     ];
                     messageApi.sendText(to, info.join("\n"), {parse_mode: "HTML"});
                 }
-            ).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
         case "/net" :
-            hostSvcApi.api("system/net").then(
+            hostSvcApi.systemApi("net").then(
                 body => {
                     const data = JSON.parse(body);
                     const text = data.reduce((last, current) => last + "\n" + current.ip + " " + (current.description !== "?" ? current.description : current.mac), "");
                     messageApi.sendText(to, text || "Nobody :(");
-                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+                }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
         case "/services" :
             hostSvcApi.msaApi("list").then(
                 body => {
-                    JSON.parse(body).map(getMessageForItem).forEach(item => messageApi.sendText(to, item.text, {reply_markup: item.reply_markup}));
-                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+                    JSON.parse(body).map(getMessageForItem).forEach(item =>
+                        messageApi.sendText(to, item.text, {reply_markup: item.reply_markup}));
+                }
+            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
         case "/wake-pc" :
-            hostSvcApi.api("system/wakePC").then(
-                () => {
-                    messageApi.sendText(to, "OK");
-                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+            hostSvcApi.systemApi("wakePC").then(
+                () => messageApi.sendText(to, "OK")
+            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
+        case "/torrent" :
+            torrentList(to);
+            break;
         case "/tv28":
             messageApi.sendText(to, "-----==== Press any button ====-----",
                 {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: "🔇", callback_data: "tv/lg28-pc/mute"}, {
+                            [{
+                                text: "🔇",
+                                callback_data: "tv/lg28-pc/mute"
+                            }, {
                                 text: "🔴",
                                 callback_data: "tv/lg28-pc/power-off"
                             }],
@@ -89,11 +96,11 @@ messageApi.onText(/\/.+/, (message) => {
                             }]
                         ]
                     })
-                }).catch(err => log.error(err) & messageApi.sendText(message.from, err.toString()));
+                }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
         case "/about" :
-            messageApi.sendText(message.from, packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url, {disable_web_page_preview: true});
+            messageApi.sendText(to, packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url, {disable_web_page_preview: true});
             break;
 
         default:
@@ -112,6 +119,9 @@ messageApi.on("callback_query", (message) => {
                         chat_id: message.message.chat.id,
                         reply_markup: item.reply_markup
                     });
+                } if (message.data.startsWith("torrent")) {
+                    messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
+                    torrentList(message.from);
                 } else {
                     messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
                 }
@@ -134,6 +144,22 @@ process.on("SIGTERM", () => {
     process.exit(0);
 });
 
+function torrentList(to) {
+    hostSvcApi.torrentApi("list").then(
+        body => {
+            JSON.parse(body).forEach(torrent =>
+                messageApi.sendText(to, torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
+                    {
+                        reply_markup: JSON.stringify({
+                            inline_keyboard: [
+                                [{text: "❌ remove", callback_data: "torrent/remove/" + torrent.id}]
+                            ]
+                        })
+                    })
+            );
+        }
+    ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
+}
 
 function getMessageForItem(item) {
     const buttonNames = {

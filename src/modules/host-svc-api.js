@@ -10,16 +10,20 @@ HostSvcApi.prototype.getUrl = function () {
     return this.url;
 };
 
+HostSvcApi.prototype.systemApi = function (command, to) {
+    return this.api('system/' + command);
+};
+
 HostSvcApi.prototype.msaApi = function (command, to) {
-    return this.api('msa/' + command, to);
+    return this.api('msa/' + command);
 };
 
-HostSvcApi.prototype.tvApi = function (tvName, command, to, callback) {
-    return this.api('tv/' + tvName + '/' + command, to, callback);
+HostSvcApi.prototype.tvApi = function (tvName, command) {
+    return this.api('tv/' + tvName + '/' + command);
 };
 
-HostSvcApi.prototype.torrentApi = function (command, to, callback) {
-    return this.api('torrent/' + command, to, callback);
+HostSvcApi.prototype.torrentApi = function (command) {
+    return this.api('torrent/' + command);
 };
 
 HostSvcApi.prototype.api = function (path) {

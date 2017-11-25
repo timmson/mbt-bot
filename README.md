@@ -8,14 +8,15 @@ Author: [timmson666@mail.ru](mailto:timmson666@mail.ru)
  
 ### Commands
 ```
-start - Start
-stop - Stop
+about - About
+net - Who is online?
 photo - Take the photo
 screen - Take the screenshot
-system - Get system information
-net - Who is online?
-wake-pc - PC wakes up
-tv28 - Get TV28 remote
 services - Get list of services
-about - About
+start - Start
+stop - Stop
+system - Get system information
+torrent - List torrents
+tv28 - Get TV28 remote
+wake-pc - PC wakes up
 ```
