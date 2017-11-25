@@ -71,9 +71,16 @@ messageApi.onText(/\/.+/, (message) => {
             ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
+        case "/wake-tv" :
+            hostSvcApi.systemApi("wakeTV").then(
+                () => messageApi.sendText(to, "OK")
+            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
+            break;
+
         case "/torrent" :
             torrentList(to);
             break;
+
         case "/tv28":
             messageApi.sendText(to, "-----==== Press any button ====-----",
                 {
