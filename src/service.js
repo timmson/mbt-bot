@@ -120,13 +120,19 @@ messageApi.on("callback_query", message => {
         hostSvcApi.api(message.data).then(
             (body) => {
                 if (message.data.startsWith("msa")) {
-                    let item = JSON.parse(body).map(getMessageForItem)[0];
-                    messageApi.editMessageText(item ? item.text : "[removed]", {
-                        message_id: message.message.message_id,
-                        chat_id: message.message.chat.id,
-                        reply_markup: item ? item.reply_markup : null
-                    });
-                } if (message.data.startsWith("torrent")) {
+                    if (message.data.endsWith("logs")) {
+                        messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
+                        messageApi.sendText(message.from, body, {disable_web_page_preview: true})
+                    } else {
+                        let item = JSON.parse(body).map(getMessageForItem)[0];
+                        messageApi.editMessageText(item ? item.text : "[removed]", {
+                            message_id: message.message.message_id,
+                            chat_id: message.message.chat.id,
+                            reply_markup: item ? item.reply_markup : null
+                        });
+                    }
+                }
+                if (message.data.startsWith("torrent")) {
                     messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
                     torrentList(message.from);
                 } else {
@@ -187,6 +193,7 @@ function getMessageForItem(item) {
         "stop": "⏹ Stop",
         "restart": "🔄 Reload",
         "remove": "🚾 Remove",
+        "logs": "🗒 Logs",
         "update": "↗️ Update"
     };
     return {
