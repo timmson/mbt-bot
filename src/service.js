@@ -65,13 +65,13 @@ messageApi.onText(/\/.+/, (message) => {
             ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
-        case "/wake-pc" :
+        case "/wakepc" :
             hostSvcApi.systemApi("wakePC").then(
                 () => messageApi.sendText(to, "OK")
             ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
 
-        case "/wake-tv" :
+        case "/waketv" :
             hostSvcApi.systemApi("wakeTV").then(
                 () => messageApi.sendText(to, "OK")
             ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
@@ -144,7 +144,7 @@ messageApi.on("document", async message => {
     try {
         let url = await messageApi.getFileLink(message.document.file_id);
         await hostSvcApi.torrentApi("add?id=" + url);
-        await messageApi.sendText(message.from, "Ok");
+        await messageApi.sendText(message.from, "OK. Type /torrent to see all");
     } catch (err) {
         log.error(err);
         messageApi.sendText(message.from, err.toString());

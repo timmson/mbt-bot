@@ -18,6 +18,6 @@ stop - Stop
 system - Get system information
 torrent - List torrents
 tv28 - Get TV28 remote
-wake-pc - PC wakes up
-wake-tv - TV wakes up
+wakepc - PC wakes up
+waketv - TV wakes up
 ```
