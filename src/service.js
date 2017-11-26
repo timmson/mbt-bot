@@ -122,7 +122,7 @@ messageApi.on("callback_query", message => {
                 if (message.data.startsWith("msa")) {
                     if (message.data.endsWith("logs")) {
                         messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
-                        messageApi.sendText(message.from, body, {disable_web_page_preview: true})
+                        messageApi.sendText(message.from, "```" + body + "```", {parse_mode: "Markdown", disable_web_page_preview: true})
                     } else {
                         let item = JSON.parse(body).map(getMessageForItem)[0];
                         messageApi.editMessageText(item ? item.text : "[removed]", {
