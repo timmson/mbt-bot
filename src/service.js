@@ -121,13 +121,12 @@ messageApi.on("callback_query", message => {
             (body) => {
                 if (message.data.startsWith("msa")) {
                     let item = JSON.parse(body).map(getMessageForItem)[0];
-                    messageApi.editMessageText(item.text, {
+                    messageApi.editMessageText(item ? item.text : "[removed]", {
                         message_id: message.message.message_id,
                         chat_id: message.message.chat.id,
-                        reply_markup: item.reply_markup
+                        reply_markup: item ? item.reply_markup : null
                     });
-                }
-                if (message.data.startsWith("torrent")) {
+                } if (message.data.startsWith("torrent")) {
                     messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
                     torrentList(message.from);
                 } else {
@@ -173,7 +172,7 @@ function torrentList(to) {
                     {
                         reply_markup: JSON.stringify({
                             inline_keyboard: [
-                                [{text: "❌ remove", callback_data: "torrent/remove/" + torrent.id}]
+                                [{text: "🚾 remove", callback_data: "torrent/remove/" + torrent.id}]
                             ]
                         })
                     })
@@ -184,10 +183,11 @@ function torrentList(to) {
 
 function getMessageForItem(item) {
     const buttonNames = {
-        "start": "⏯ Start",
+        "start": "▶️ Start",
         "stop": "⏹ Stop",
         "restart": "🔄 Reload",
-        "update": "↗️Update"
+        "remove": "🚾 Remove",
+        "update": "↗️ Update"
     };
     return {
         text: item.name + " " + (item.state === "running" ? "☀" : "🌩") + " [" + item.status.toLowerCase() + "]",
