@@ -133,8 +133,10 @@ messageApi.on("callback_query", message => {
                     }
                 }
                 if (message.data.startsWith("torrent")) {
-                    messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
-                    torrentList(message.from);
+                    messageApi.editMessageText("[removed]", {
+                        message_id: message.message.message_id,
+                        chat_id: message.message.chat.id
+                    });
                 } else {
                     messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
                 }
