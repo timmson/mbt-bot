@@ -199,7 +199,7 @@ function getMessageForItem(item) {
         "update": "↗️ Update"
     };
     return {
-        text: item.name + " " + (item.state === "running" ? "☀" : "🌩") + " [" + item.status.toLowerCase() + "]",
+        text: item.name + " " + (item.state === "running" ? "🌞" : "🌜") + " [" + item.status.toLowerCase() + "]",
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 item.actions.map(action => {
