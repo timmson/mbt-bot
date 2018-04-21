@@ -32,7 +32,7 @@ HostSvcApi.prototype.addTorrent = function (torrentUrl) {
         method: "POST",
         uri: this.url + "/torrent/add",
         formData: {
-            torrentFile: requestStream(uri)
+            torrentFile: requestStream(torrentUrl)
         }
     });
 };
