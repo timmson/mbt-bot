@@ -5,7 +5,7 @@ const MessageApi = require("./modules/message-api.js");
 const HostSvcApi = require("./modules/host-svc-api.js");
 
 const messageApi = new MessageApi(config.message);
-const hostSvcApi = new HostSvcApi(config.hostSvc);
+const hostSvcApi = new HostSvcApi(config);
 
 messageApi.onText(/\/.+/, (message) => {
     const to = message.from;
@@ -149,12 +149,7 @@ messageApi.on("callback_query", message => {
 messageApi.on("document", async message => {
     console.log(message);
     try {
-        //let url = await messageApi.getFileLink(message.document.file_id);
-        hostSvcApi.addTorrent(await messageApi.getFileLink(message.document.file_id)).then(o => {
-		log.info("OK");
-	}, error => {
-		log.error(error);
-	});
+        await hostSvcApi.addTorrent(await messageApi.getFileLink(message.document.file_id));
         await messageApi.sendText(message.from, "OK. Type /torrent to see all");
     } catch (err) {
         log.error(err);
