@@ -26,6 +26,17 @@ HostSvcApi.prototype.torrentApi = function (command) {
     return this.api('torrent/' + command);
 };
 
+HostSvcApi.prototype.addTorrent = function (torrentUrl) {
+    log.info('Sending ' + torrentUrl);
+    return request({
+        method: "POST",
+        uri: this.url + "/torrent/add",
+        formData: {
+            torrentFile: requestStream(uri)
+        }
+    });
+};
+
 HostSvcApi.prototype.api = function (path) {
     const apiUrl = this.url + '/' + path;
     log.info('Calling ' + apiUrl);

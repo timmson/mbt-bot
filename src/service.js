@@ -149,8 +149,8 @@ messageApi.on("callback_query", message => {
 messageApi.on("document", async message => {
     console.log(message);
     try {
-        let url = await messageApi.getFileLink(message.document.file_id);
-        await hostSvcApi.torrentApi("add?id=" + url);
+        //let url = await messageApi.getFileLink(message.document.file_id);
+        await hostSvcApi.addTorrent(await messageApi.getFileLink(message.document.file_id));
         await messageApi.sendText(message.from, "OK. Type /torrent to see all");
     } catch (err) {
         log.error(err);
