@@ -5,7 +5,7 @@
   "main": "bot.js",
   "dependencies": {
     "log4js": "^0.6.38",
-    "node-telegram-bot-api": "0.28.0",
+    "node-telegram-bot-api": "0.30.0",
     "request": "2.79.0",
     "request-promise": "4.2.1"
   },
