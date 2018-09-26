@@ -51,7 +51,7 @@ messageApi.onText(/\/.+/, (message) => {
             hostSvcApi.systemApi("net").then(
                 body => {
                     const data = JSON.parse(body);
-                    const text = data.reduce((last, current) => last + "\n" + current.ip + " " + (current.description !== "?" ? current.description : current.mac), "");
+                    const text = data.reduce((last, current) => last + "\n" + current.ip + " " + (current.description !== "?" ? current.description : current.mac + " " + current.vendor), "");
                     messageApi.sendText(to, text || "Nobody :(");
                 }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
             break;
