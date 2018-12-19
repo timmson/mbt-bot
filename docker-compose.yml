@@ -10,8 +10,3 @@ services:
          - config_server
          - config_path=/mbt-bot/config.js
      restart: always
-
-networks:
-  default:
-    external:
-      name: mynet
