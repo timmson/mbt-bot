@@ -9,7 +9,7 @@ const hostSvcApi = new HostSvcApi(config);
 
 messageApi.onText(/\/.+/, (message) => {
     const to = message.from;
-    if (!messageApi.isOwner(to.id)) {
+    if (!messageApi.isAllowed(to.id)) {
         messageApi.sendText(to, ";(", {});
         return;
     }

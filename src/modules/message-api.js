@@ -5,11 +5,11 @@ const TelegramBotApi = require('node-telegram-bot-api');
 
 function MessageApi(config) {
     this.bot = new TelegramBotApi(config.token, config.params);
-    this.ownerId = config.owner;
+    this.userIds = config.users;
 }
 
-MessageApi.prototype.isOwner = function (id) {
-    return this.ownerId === id;
+MessageApi.prototype.isAllowed = function (id) {
+    return this.userIds.includes(id);
 };
 
 MessageApi.prototype.on = function (name, handler) {
