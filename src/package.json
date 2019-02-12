@@ -7,12 +7,13 @@
     "log4js": "^0.6.38",
     "node-telegram-bot-api": "0.30.0",
     "request": "2.87.0",
-    "request-promise": "4.2.2"
+    "request-promise": "4.2.2",
+    "socks5-https-client": "1.2.1"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "nodejs service.js",
-    "test": "nodejs test.js"
+    "start": "node service.js",
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",

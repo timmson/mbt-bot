@@ -1,10 +1,12 @@
 const log = require("log4js").getLogger("host-api");
+const fs = require("fs");
 const requestStream = require("request");
 const request = require("request-promise");
+const Agent = require("socks5-https-client/lib/Agent");
 
 function HostSvcApi(config) {
-    this.url = "http://" + config.hostSvc.host + ":" + config.hostSvc.port
-    this.proxy = config.message.params.request.proxy;
+    this.url = "http://" + config.hostSvc.host + ":" + config.hostSvc.port;
+    this.config = config;
 }
 
 HostSvcApi.prototype.getUrl = function () {
@@ -33,7 +35,15 @@ HostSvcApi.prototype.addTorrent = function (torrentUrl) {
         method: "POST",
         uri: this.url + "/torrent/add",
         formData: {
-            torrentFile: requestStream(torrentUrl, {proxy: this.proxy})
+            torrentFile: requestStream.get({
+                    url: torrentUrl,
+                    agentClass: Agent,
+                    agentOptions: {
+                        socksHost: this.config.message.socksHost,
+                        socksPort: this.config.message.socksPort
+                    }
+                }
+            )
         }
     });
 };
