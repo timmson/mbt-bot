@@ -30,7 +30,26 @@ HostSvcApi.prototype.torrentApi = function (command) {
 };
 
 HostSvcApi.prototype.addTorrent = function (torrentUrl) {
-    log.info("Sending " + torrentUrl);
+    return new Promise((resolve, reject) => {
+        let stream = requestStream.get({
+                url: torrentUrl,
+                agentClass: Agent,
+                agentOptions: {
+                    socksHost: this.config.message.socksHost,
+                    socksPort: this.config.message.socksPort
+                }
+            }
+        ).pipe(fs.createWriteStream("c:\\downloads\\" + new Date().getTime() + ".torrent"));
+
+        stream.on("finish", () => {
+            resolve("OK")
+        });
+
+        stream.on("error", (error) => {
+            reject(error)
+        });
+    });
+/*    log.info("Sending " + torrentUrl);
     return request({
         method: "POST",
         uri: this.url + "/torrent/add",
@@ -45,7 +64,7 @@ HostSvcApi.prototype.addTorrent = function (torrentUrl) {
                 }
             )
         }
-    });
+    });*/
 };
 
 HostSvcApi.prototype.api = function (path) {
