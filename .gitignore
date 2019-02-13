@@ -1,3 +1,4 @@
 src/node_modules
 .idea/
-src/config.js
+node_modules
+config.js

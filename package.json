@@ -1,0 +1,31 @@
+{
+  "name": "bot-node",
+  "version": "0.9.5",
+  "description": "Private bot",
+  "main": "bot.js",
+  "dependencies": {
+    "bytes": "3.1.0",
+    "log4js": "^0.6.38",
+    "node-telegram-bot-api": "0.30.0",
+    "request": "2.87.0",
+    "request-promise": "4.2.2",
+    "socks5-https-client": "1.2.1",
+    "transmission-promise": "1.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node service.js",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timmson/mbt-bot"
+  },
+  "keywords": [
+    "timmson",
+    "bot",
+    "node"
+  ],
+  "author": "timmson",
+  "license": "GPL-3.0"
+}

@@ -1,0 +1,19 @@
+module.exports = {
+    message: {
+        token: "<your token>",
+        polling: true,
+        socksProxy: "<tor IP>",
+        socksPort: <tor port>,
+        owner: 1,
+        users: [1, 2]
+    },
+    torrent: {
+      host: "<transmission IP>",
+      port: <transmission port>,
+      downloadDir: "<your download dir>"
+    },
+    hostSvc: {
+        host: "192.168.0.3",
+        port: 9092
+    }
+};
