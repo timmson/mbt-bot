@@ -1,9 +1,10 @@
 const config = require("./config.js");
 const packageInfo = require("./package.json");
 const log = require("log4js").getLogger();
-const MessageApi = require("./modules/message-api.js");
-const HostSvcApi = require("./modules/host-svc-api.js");
-const TorrentApi = require("./modules/torrent-api.js");
+const MessageApi = require("./modules/message-api");
+const HostSvcApi = require("./modules/host-svc-api");
+const TorrentApi = require("./modules/torrent-api");
+const systemApi = require("./modules/system-api");
 
 const messageApi = new MessageApi(config.message);
 const hostSvcApi = new HostSvcApi(config);
@@ -33,15 +34,16 @@ messageApi.onText(/\/.+/, (message) => {
             break;
 
         case "/system" :
-            hostSvcApi.systemApi("info").then(
-                body => {
-                    const data = JSON.parse(body);
+            systemApi.getInfo().then(
+                data => {
+                    log.info(data);
                     let info = [
                         "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
                             last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
                         "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
                         "📊 " + data.memory.active + " of " + data.memory.total,
-                        "💾 " + data.storage[0].used + " of " + data.storage[0].size,
+                        "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+                        "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
                         "🔮 " + data.network.rx + "/" + data.network.tx
                     ];
                     messageApi.sendText(to, info.join("\n"), {parse_mode: "HTML"});
