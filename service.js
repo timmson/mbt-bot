@@ -129,7 +129,6 @@ messageApi.on("callback_query", message => {
 );
 
 messageApi.on("document", async message => {
-    console.log(message);
     try {
         await torrentApi.add(await messageApi.getFileLink(message.document.file_id));
         await messageApi.sendText(message.from, "OK. Type /torrent to see all");
