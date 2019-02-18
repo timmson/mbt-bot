@@ -1,143 +1,154 @@
 const config = require("./config.js");
 const packageInfo = require("./package.json");
 const log = require("log4js").getLogger();
-const MessageApi = require("./modules/message-api");
-const HostSvcApi = require("./modules/host-svc-api");
+const fs = require("fs");
+
 const TorrentApi = require("./modules/torrent-api");
 const systemApi = require("./modules/system-api");
+/**
+ * Use it!
+ * @type {*|(function(): Promise)}
+ */
+const nircmd = require("nircmd");
 
-const messageApi = new MessageApi(config.message);
-const hostSvcApi = new HostSvcApi(config);
+const Agent = require("socks5-https-client/lib/Agent");
+
+const Telegraf = require("telegraf");
+const Markup = require('telegraf/markup');
+
 const torrentApi = new TorrentApi(config);
 
-messageApi.onText(/\/.+/, (message) => {
-    const to = message.from;
-    if (!messageApi.isAllowed(to.id)) {
-        messageApi.sendText(to, ";(", {});
-        return;
+function sendError(ctx, err) {
+    log.error(err);
+    ctx.reply(err.toString());
+}
+
+let options = {
+    telegram: {
+        agent: new Agent({
+            socksHost: config.message.socksHost,
+            socksPort: config.message.socksPort
+        })
     }
-    switch (message.text) {
-        case "/start" :
-            messageApi.sendText(to, "Type " / " to show more commands");
-            break;
+};
+let bot = new Telegraf(config.message.token, options);
 
-        case "/stop" :
-            messageApi.sendText(to, "Ok, see you later!");
-            break;
+bot.command("start", ctx => ctx.reply("Type \" / \" to show more commands"));
+bot.command("stop", ctx => ctx.reply("Ok, see you later!"));
+bot.command("about", ctx => ctx.reply(packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url));
 
-        /*        case "/photo" :
-                    messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/system/camera.jpg", {});
-                    break;*/
+bot.command("system", ctx =>
+    systemApi.getInfo().then(
+        data => {
+            let info = [
+                "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
+                    last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
+                "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
+                "📊 " + data.memory.active + " of " + data.memory.total,
+                "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+                "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
+                "🔮 " + data.network.rx + "/" + data.network.tx
+            ];
+            ctx.replyWithHTML(info.join("\n")).catch(err => sendError(ctx, err));
+        },
+        err => sendError(ctx, err)
+    )
+);
 
-        case "/screen" :
-            messageApi.sendPhoto(to, hostSvcApi.getUrl() + "/system/screen.jpg", {});
-            break;
+//        case "/tv28":
+//             messageApi.sendText(to, "-----==== Press any button ====-----",
+//                 {
+//                     reply_markup: JSON.stringify({
+//                         inline_keyboard: [
+//                             [{
+//                                 text: "🔇",
+//                                 callback_data: "tv/lg28-pc/mute"
+//                             }, {
+//                                 text: "🔴",
+//                                 callback_data: "tv/lg28-pc/power-off"
+//                             }],
+//                             [{text: "🔊", callback_data: "tv/lg28-pc/volume-up"}, {
+//                                 text: "🔼",
+//                                 callback_data: "tv/lg28-pc/channel-up"
+//                             }],
+//                             [{text: "🔉", callback_data: "tv/lg28-pc/volume-down"}, {
+//                                 text: "🔽",
+//                                 callback_data: "tv/lg28-pc/channel-down"
+//                             }]
+//                         ]
+//                     })
+//                 }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
+//             break;
 
-        case "/system" :
-            systemApi.getInfo().then(
-                data => {
-                    log.info(data);
-                    let info = [
-                        "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
-                            last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
-                        "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
-                        "📊 " + data.memory.active + " of " + data.memory.total,
-                        "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
-                        "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
-                        "🔮 " + data.network.rx + "/" + data.network.tx
-                    ];
-                    messageApi.sendText(to, info.join("\n"), {parse_mode: "HTML"});
-                }
-            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
-            break;
+//bot.command("net"
 
-        /*        case "/net" :
-                    hostSvcApi.systemApi("net").then(
-                        body => {
-                            const data = JSON.parse(body);
-                            const text = data.reduce((last, current) => last + "\n" + current.ip + " " + (current.description !== "?" ? current.description : current.mac + " " + current.vendor), "");
-                            messageApi.sendText(to, text || "Nobody :(");
-                        }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
-                    break;*/
+//bot.command("camera"
 
-        case "/torrent" :
-            torrentApi.list().then(torrents =>
-                torrents.forEach(torrent =>
-                    messageApi.sendText(to, torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
-                        {
-                            reply_markup: JSON.stringify({
-                                inline_keyboard: [
-                                    [{text: "🚾 remove", callback_data: "torrent-remove-" + torrent.id}]
-                                ]
-                            })
-                        })
-                )
-            ).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
-            break;
+bot.command("screen", ctx => {
+    /**
+     * https://github.com/telegraf/telegraf/issues/63
+     */
 
-        case "/tv28":
-            messageApi.sendText(to, "-----==== Press any button ====-----",
-                {
-                    reply_markup: JSON.stringify({
-                        inline_keyboard: [
-                            [{
-                                text: "🔇",
-                                callback_data: "tv/lg28-pc/mute"
-                            }, {
-                                text: "🔴",
-                                callback_data: "tv/lg28-pc/power-off"
-                            }],
-                            [{text: "🔊", callback_data: "tv/lg28-pc/volume-up"}, {
-                                text: "🔼",
-                                callback_data: "tv/lg28-pc/channel-up"
-                            }],
-                            [{text: "🔉", callback_data: "tv/lg28-pc/volume-down"}, {
-                                text: "🔽",
-                                callback_data: "tv/lg28-pc/channel-down"
-                            }]
-                        ]
-                    })
-                }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
-            break;
-
-        case "/about" :
-            messageApi.sendText(to, packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url, {disable_web_page_preview: true});
-            break;
-
-        default:
-            messageApi.sendText(to, ";(", {});
-            break;
-    }
+    /*let imageName = __dirname + "/" + config.temporaryPath + "/shot" + new Date().getTime() + ".jpg";
+    nircmd("cmdwait savescreenshot " + imageName).then(
+        () => ctx.replyWithPhoto({
+            source: fs.createReadStream("./tmp/shot1550527616558.jpg")
+        }),
+        err => log.error(err) & ctx.reply(err.toString())
+    );*/
 });
 
-messageApi.on("callback_query", message => {
-        let data = message.data.split("-");
-        if (data[0] === "torrent") {
-            if (data[1] === "remove") {
-                torrentApi.remove(data[2]).then(
-                    body => messageApi.editMessageText("[removed]", {
-                        message_id: message.message.message_id,
-                        chat_id: message.message.chat.id
-                    }),
-                    err => messageApi.answerCallbackQuery({callback_query_id: message.id, text: "⛔️" + err.toString()})
-                );
+bot.command("torrent", ctx => {
+        torrentApi.list().then(
+            torrents =>
+                torrents.forEach(torrent =>
+                    ctx.reply(
+                        torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
+                        Markup.inlineKeyboard(
+                            [
+                                Markup.callbackButton("🚾 remove", "torrent-remove-" + torrent.id)
+                            ]
+                        ).extra()
+                    )
+                ),
+            err => sendError(ctx, err)
+        )
+    }
+);
+
+
+bot.on("callback_query", async ctx => {
+        try {
+            let data = ctx.callbackQuery.data.split("-");
+            if (data[0] === "torrent") {
+                if (data[1] === "remove") {
+                    await torrentApi.remove(data[2]);
+                    await ctx.editMessageText("[removed]");
+                }
+            } else {
+                await ctx.answerCbQuery("🆗");
             }
-        } else {
-            messageApi.answerCallbackQuery({callback_query_id: message.id, text: "🆗"});
+        } catch (err) {
+            ctx.answerCbQuery("⛔️" + err.toString()).catch(err => sendError(ctx, err));
         }
     }
 );
 
-messageApi.on("document", async message => {
+/**
+ * TODO
+ * Migrate to native Telegraph Api
+ */
+bot.on("document", async ctx => {
     try {
-        await torrentApi.add(await messageApi.getFileLink(message.document.file_id));
-        await messageApi.sendText(message.from, "OK. Type /torrent to see all");
+        await torrentApi.add(await bot.telegram.getFileLink(ctx.message.document.file_id));
+        await ctx.reply("OK. Type /torrent to see all");
     } catch (err) {
-        log.error(err);
-        messageApi.sendText(message.from, err.toString());
-
+        sendError(ctx, err)
     }
 });
+
+
+bot.startPolling();
 
 log.info("Bot has started");
 log.info("Please press [CTRL + C] to stop");
@@ -151,5 +162,3 @@ process.on("SIGTERM", () => {
     log.info("Bot has stopped");
     process.exit(0);
 });
-
-

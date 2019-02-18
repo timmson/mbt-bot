@@ -1,11 +1,14 @@
 const bytes = require("bytes");
 const si = require("systeminformation");
 const log = require("log4js").getLogger("system-info");
+const nircmd = ("nircmd");
 
-log.level = "info";
+class SystemApi {
+    static getScreen(imageName) {
+        return nircmd("cmdwait savescreenshot " + imageName);
+    }
 
-module.exports = {
-    getInfo: () => {
+    static getInfo() {
         return new Promise(async (resolve, reject) => {
             try {
                 let data = {
@@ -44,4 +47,6 @@ module.exports = {
         });
 
     }
-};
+}
+
+module.exports = SystemApi;

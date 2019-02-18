@@ -12,8 +12,5 @@ module.exports = {
       port: <transmission port>,
       downloadDir: "<your download dir>"
     },
-    hostSvc: {
-        host: "192.168.0.3",
-        port: 9092
-    }
+    temporaryPath: "/tmp",
 };
