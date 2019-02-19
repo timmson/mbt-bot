@@ -9,15 +9,10 @@ Author: [timmson666@mail.ru](mailto:timmson666@mail.ru)
 ### Commands
 ```
 about - About
-net - Who is online?
-photo - Take the photo
 screen - Take the screenshot
-services - Get list of services
 start - Start
 stop - Stop
 system - Get system information
 torrent - List torrents
 tv28 - Get TV28 remote
-wakepc - PC wakes up
-waketv - TV wakes up
 ```
