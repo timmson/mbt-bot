@@ -1,11 +1,34 @@
+const $ = require("jquery");
+const {ipcRenderer} = require("electron");
+const moment = require("moment");
+
+
+let log = (data) => {
+    let message = [
+        "<span class=\"",
+        data.level,
+        "\">[",
+        moment(data.date).format("YYYY-MM-DD HH:mm:ss.SSS"),
+        "]  [",
+        data.level.toUpperCase(),
+        "]</span>  ",
+        data.message,
+        "<br/>"
+    ];
+    $("div#log").append(message.join(""));
+};
+
 $(() => {
 
-    const {ipcRenderer} = require("electron");
-
     ipcRenderer.on("log", (event, arg) => {
-        console.log(arg);
-        let message = "<span class=\"" + arg.level + "\">[" + new Date(arg.date).toISOString() + "] " + arg.message + "</span>";
-        $("div#log").append(message);
+        $("div#log").append(log(arg));
+    });
+
+    log({
+        level: "info",
+        date: new Date(),
+        message: "Bot has started"
     });
 
 });
+
