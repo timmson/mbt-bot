@@ -1,8 +1,88 @@
 const config = require("./config.js");
 const packageInfo = require("./package.json");
-const log = require("log4js").getLogger();
-const fs = require("fs");
+const log1 = require("log4js").getLogger();
 
+
+///////////////////////////////////
+const {app, BrowserWindow, Tray} = require("electron");
+const path = require("path");
+const url = require("url");
+
+let window = null;
+let tray = null;
+
+let log = log1;
+let position = {};
+
+// Wait until the app is ready
+app.once("ready", () => {
+
+
+    // Create a new tray
+    tray = new Tray(path.join(__dirname, config.webDir, "icon.png"));
+    tray.on("right-click", () => {
+        window.close();
+        log.info("Bot has stopped");
+        process.exit(0);
+    });
+    tray.on("double-click", toggleWindow);
+    tray.on("click", function (event) {
+        toggleWindow()
+    });
+
+    window = new BrowserWindow({
+        width: 1000,
+        height: 800,
+        titleBarStyle: "hiddenInset",
+        backgroundColor: "#fff",
+        show: false,
+    });
+
+    position = window.getPosition();
+
+    window.loadURL(url.format({
+        pathname: path.join(__dirname, config.webDir, "index.html"),
+        protocol: "file:",
+        slashes: true
+    }));
+
+    window.once("ready-to-show", () => {
+        //window.show();
+    });
+
+    window.on("close", (event) => {
+        position = window.getPosition();
+        event.preventDefault();
+        window.hide();
+    });
+
+    function Log() {
+        this.info = function (message) {
+            log1.info(message);
+            window.webContents.send("log", new Date() + " " + message);
+        };
+    }
+
+    log = new Log();
+});
+
+// toggle window
+const toggleWindow = () => {
+    if (window.isVisible()) {
+        window.hide();
+    } else {
+        showWindow();
+    }
+};
+
+const showWindow = () => {
+    window.setPosition(position[0], position[1], false);
+    window.show();
+    window.focus();
+};
+
+
+////////////////////////////////
 const TorrentApi = require("./modules/torrent-api");
 const systemApi = require("./modules/system-api");
 /**
@@ -14,7 +94,7 @@ const nircmd = require("nircmd");
 const Agent = require("socks5-https-client/lib/Agent");
 
 const Telegraf = require("telegraf");
-const Markup = require('telegraf/markup');
+const Markup = require("telegraf/markup");
 
 const torrentApi = new TorrentApi(config);
 
@@ -35,24 +115,29 @@ let bot = new Telegraf(config.message.token, options);
 
 bot.command("start", ctx => ctx.reply("Type \" / \" to show more commands"));
 bot.command("stop", ctx => ctx.reply("Ok, see you later!"));
-bot.command("about", ctx => ctx.reply(packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url));
+bot.command("about", ctx => {
+    log.info("/about from " + ctx.from.username);
+    ctx.reply(packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url)
+});
 
-bot.command("system", ctx =>
-    systemApi.getInfo().then(
-        data => {
-            let info = [
-                "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
-                    last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
-                "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
-                "📊 " + data.memory.active + " of " + data.memory.total,
-                "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
-                "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
-                "🔮 " + data.network.rx + "/" + data.network.tx
-            ];
-            ctx.replyWithHTML(info.join("\n")).catch(err => sendError(ctx, err));
-        },
-        err => sendError(ctx, err)
-    )
+bot.command("system", ctx => {
+        log.info("/system from " + ctx.from.username);
+        systemApi.getInfo().then(
+            data => {
+                let info = [
+                    "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
+                        last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
+                    "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
+                    "📊 " + data.memory.active + " of " + data.memory.total,
+                    "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+                    "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
+                    "🔮 " + data.network.rx + "/" + data.network.tx
+                ];
+                ctx.replyWithHTML(info.join("\n")).catch(err => sendError(ctx, err));
+            },
+            err => sendError(ctx, err)
+        )
+    }
 );
 
 //        case "/tv28":
@@ -99,6 +184,7 @@ bot.command("screen", ctx => {
 });
 
 bot.command("torrent", ctx => {
+        log.info("/torrent from " + ctx.from.username);
         torrentApi.list().then(
             torrents =>
                 torrents.forEach(torrent =>
@@ -139,6 +225,7 @@ bot.on("callback_query", async ctx => {
  * Migrate to native Telegraph Api
  */
 bot.on("document", async ctx => {
+    log.info("file from " + ctx.from.username);
     try {
         await torrentApi.add(await bot.telegram.getFileLink(ctx.message.document.file_id));
         await ctx.reply("OK. Type /torrent to see all");

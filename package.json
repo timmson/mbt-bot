@@ -1,8 +1,9 @@
 {
-  "name": "bot-node",
-  "version": "0.9.5",
+  "name": "mbt-bot",
+  "version": "1.9.5",
   "description": "Private bot",
-  "main": "bot.js",
+  "main": "app.js",
+  "private": true,
   "dependencies": {
     "bytes": "3.1.0",
     "log4js": "^0.6.38",
@@ -14,10 +15,13 @@
     "telegraf": "3.27.1",
     "transmission-promise": "1.1.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "electron": "4.0.5",
+    "electron-packager": "13.0.1"
+  },
   "scripts": {
-    "start": "node service.js",
-    "test": "node test.js"
+    "start": "electron .",
+    "package": "electron-packager . --ignore .idea --overwrite --out bin"
   },
   "repository": {
     "type": "git",
