@@ -1,7 +1,6 @@
 const bytes = require("bytes");
 const si = require("systeminformation");
-const log = require("log4js").getLogger("system-info");
-const nircmd = ("nircmd");
+const nircmd = require("nircmd");
 
 class SystemApi {
     static getScreen(imageName) {
@@ -41,7 +40,6 @@ class SystemApi {
                 });
                 resolve(data);
             } catch (error) {
-                log.error(error);
                 reject(error);
             }
         });

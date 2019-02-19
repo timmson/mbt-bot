@@ -1,17 +1,35 @@
 const config = require("./config.js");
 const packageInfo = require("./package.json");
-const log1 = require("log4js").getLogger();
+const path = require("path");
+const url = require("url");
+const fs = require("fs");
 
 
 ///////////////////////////////////
 const {app, BrowserWindow, Tray} = require("electron");
-const path = require("path");
-const url = require("url");
+
 
 let window = null;
 let tray = null;
 
-let log = log1;
+function Log(sender) {
+    this.sender = sender;
+
+    this.info = function (message) {
+        if (this.sender) {
+            this.sender.send("log", {level: "info", date: new Date(), message});
+        }
+    };
+
+    this.error = function (message) {
+        if (this.sender) {
+            this.sender.send("log", {level: "error", date: new Date(), message});
+        }
+    };
+}
+
+let log = new Log(null);
+
 let position = {};
 
 // Wait until the app is ready
@@ -20,21 +38,19 @@ app.once("ready", () => {
 
     // Create a new tray
     tray = new Tray(path.join(__dirname, config.webDir, "icon.png"));
-    tray.on("right-click", () => {
+    tray.on("double-click", () => {
         window.close();
         log.info("Bot has stopped");
         process.exit(0);
     });
-    tray.on("double-click", toggleWindow);
-    tray.on("click", function (event) {
-        toggleWindow()
-    });
+    tray.on("right-click", toggleWindow);
+    tray.on("click", toggleWindow);
 
     window = new BrowserWindow({
         width: 1000,
         height: 800,
         titleBarStyle: "hiddenInset",
-        backgroundColor: "#fff",
+        backgroundColor: "#000",
         show: false,
     });
 
@@ -56,14 +72,8 @@ app.once("ready", () => {
         window.hide();
     });
 
-    function Log() {
-        this.info = function (message) {
-            log1.info(message);
-            window.webContents.send("log", new Date() + " " + message);
-        };
-    }
+    log = new Log(window.webContents);
 
-    log = new Log();
 });
 
 // toggle window
@@ -85,13 +95,7 @@ const showWindow = () => {
 ////////////////////////////////
 const TorrentApi = require("./modules/torrent-api");
 const systemApi = require("./modules/system-api");
-/**
- * Use it!
- * @type {*|(function(): Promise)}
- */
-const nircmd = require("nircmd");
-
-const Agent = require("socks5-https-client/lib/Agent");
+const Agent = require("socks-proxy-agent");
 
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
@@ -105,10 +109,7 @@ function sendError(ctx, err) {
 
 let options = {
     telegram: {
-        agent: new Agent({
-            socksHost: config.message.socksHost,
-            socksPort: config.message.socksPort
-        })
+        agent: new Agent(config.socks)
     }
 };
 let bot = new Telegraf(config.message.token, options);
@@ -117,7 +118,7 @@ bot.command("start", ctx => ctx.reply("Type \" / \" to show more commands"));
 bot.command("stop", ctx => ctx.reply("Ok, see you later!"));
 bot.command("about", ctx => {
     log.info("/about from " + ctx.from.username);
-    ctx.reply(packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url)
+    ctx.reply(packageInfo.name + " " + packageInfo.version + "\n" + packageInfo.repository.url);
 });
 
 bot.command("system", ctx => {
@@ -169,18 +170,16 @@ bot.command("system", ctx => {
 
 //bot.command("camera"
 
-bot.command("screen", ctx => {
-    /**
-     * https://github.com/telegraf/telegraf/issues/63
-     */
-
-    /*let imageName = __dirname + "/" + config.temporaryPath + "/shot" + new Date().getTime() + ".jpg";
-    nircmd("cmdwait savescreenshot " + imageName).then(
-        () => ctx.replyWithPhoto({
-            source: fs.createReadStream("./tmp/shot1550527616558.jpg")
-        }),
-        err => log.error(err) & ctx.reply(err.toString())
-    );*/
+bot.command("screen", async ctx => {
+    log.info("/screen from " + ctx.from.username);
+    let imageName = path.join(__dirname, config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
+    try {
+        await systemApi.getScreen(imageName);
+        await ctx.replyWithPhoto({source: fs.createReadStream(imageName)});
+        fs.unlinkSync(imageName);
+    } catch (err) {
+        sendError(ctx, err);
+    }
 });
 
 bot.command("torrent", ctx => {
@@ -237,8 +236,8 @@ bot.on("document", async ctx => {
 
 bot.startPolling();
 
-log.info("Bot has started");
-log.info("Please press [CTRL + C] to stop");
+console.log("Bot has started");
+console.log("Please press [CTRL + C] to stop");
 
 process.on("SIGINT", () => {
     log.info("Bot has stopped");

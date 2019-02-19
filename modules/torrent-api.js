@@ -1,11 +1,8 @@
 const bytes = require("bytes");
 const fs = require("fs");
-const log = require("log4js").getLogger("torrent");
 const request = require("request");
-const Agent = require("socks5-https-client/lib/Agent");
+const Agent = require("socks-proxy-agent");
 const Transmission = require("transmission-promise");
-
-log.level = "info";
 
 let that = null;
 
@@ -39,11 +36,7 @@ Torrent.prototype.add = function (url) {
     return new Promise((resolve, reject) => {
         let stream = request.get({
                 url: url,
-                agentClass: Agent,
-                agentOptions: {
-                    socksHost: that.config.message.socksHost,
-                    socksPort: that.config.message.socksPort
-                }
+                agent: new Agent(that.config.socks)
             }
         ).pipe(fs.createWriteStream(that.config.torrent.downloadDir + new Date().getTime() + ".torrent"));
 
