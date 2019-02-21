@@ -3,8 +3,16 @@ const si = require("systeminformation");
 const nircmd = require("nircmd");
 
 class SystemApi {
+    static sendCommand(command) {
+        return nircmd(command);
+    }
+
+    static sendKey(key) {
+        return nircmd(["sendkey", key, "press"].join(" "));
+    }
+
     static getScreen(imageName) {
-        return nircmd("cmdwait savescreenshot " + imageName);
+        return nircmd(["savescreenshot", imageName].join(" "));
     }
 
     static getInfo() {

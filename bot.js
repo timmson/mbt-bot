@@ -9,6 +9,7 @@ const Agent = require("socks-proxy-agent");
 
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
+const nircmd = require("nircmd");
 
 let that = null;
 
@@ -79,6 +80,37 @@ Bot.prototype.startSystem = () => {
                 },
                 err => that.sendError(ctx, err)
             )
+        }
+    );
+
+    that.bot.command("pc", ctx => {
+            that.sendInfo(ctx, "/pc", 0);
+            ctx.reply("-----==== Press any button ====-----",
+                Markup.inlineKeyboard([
+                        [
+                            Markup.callbackButton("🔉", "pc-key-0xAE"),
+                            Markup.callbackButton("🔇", "pc-key-0xAD"),
+                            Markup.callbackButton("🔊", "pc-key-0xAF")
+                        ],
+                        [
+                            Markup.callbackButton("⏪", "pc-key-0xB1"),
+                            Markup.callbackButton("⏯", "pc-key-0xB3"),
+                            Markup.callbackButton("⏩", "pc-key-0xB0")
+                        ],
+                        [
+                            Markup.callbackButton("YT ❌ ", "pc-shortcut-0x11-0x57"),
+                            Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
+                            Markup.callbackButton("YT 🖥", "pc-key-0x46"),
+                        ],
+                        [
+                            Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
+                            Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
+                            Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27"),
+                        ]
+                    ]
+                ).extra()
+            );
+            that.sendInfo(ctx, "Data sent", 2);
         }
     );
 
@@ -156,16 +188,53 @@ Bot.prototype.startTorrent = () => {
             try {
                 that.sendInfo(ctx, ctx.callbackQuery.data, 0);
                 let data = ctx.callbackQuery.data.split("-");
-                if (data[0] === "torrent") {
-                    if (data[1] === "remove") {
-                        await that.torrentApi.remove(data[2]);
-                        await ctx.editMessageText("[removed]");
-                    }
-                } else {
-                    await ctx.answerCbQuery("🆗");
+                switch (data[0]) {
+
+                    case "torrent":
+                        if (data[1] === "remove") {
+                            await that.torrentApi.remove(data[2]);
+                            await ctx.editMessageText("[removed]");
+                        } else {
+                            await ctx.answerCbQuery("⚠");
+                        }
+                        break;
+
+                    case "pc":
+                        switch (data[1]) {
+
+                            case "key":
+                                await systemApi.sendKey(data[2]);
+                                await ctx.answerCbQuery("🆗");
+                                break;
+
+                            case "shortcut":
+                                for (let i = 2; i<data.length; i++) {
+                                    await systemApi.sendCommand(["sendkey", data[i], "down"]);
+                                }
+                                for (let i = 2; i<data.length; i++) {
+                                    await systemApi.sendCommand(["sendkey", data[i], "up"]);
+                                }
+                                await ctx.answerCbQuery("🆗");
+                                break;
+
+                            case "command":
+                                await systemApi.sendCommand(data[2]);
+                                await ctx.answerCbQuery("🆗");
+                                break;
+                            default:
+                                await ctx.answerCbQuery("⚠");
+                                break;
+                        }
+                        break;
+
+                    default:
+                        await ctx.answerCbQuery("⚠");
+                        break;
+
                 }
                 that.sendInfo(ctx, "Data sent", 2);
             } catch (err) {
+                console.error(err);
                 ctx.answerCbQuery("⛔️" + err.toString()).catch(err => that.sendError(ctx, err));
             }
         }

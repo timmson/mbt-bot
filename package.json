@@ -6,6 +6,8 @@
   "private": true,
   "dependencies": {
     "bytes": "3.1.0",
+    "electron": "4.0.5",
+    "http-proxy-to-socks": "1.1.0",
     "jquery": "3.3.1",
     "moment": "2.24.0",
     "nircmd": "2.0.0",
@@ -17,9 +19,7 @@
     "transmission-promise": "1.1.2"
   },
   "devDependencies": {
-    "electron": "4.0.5",
-    "electron-packager": "13.0.1",
-    "http-proxy-to-socks": "1.1.0"
+    "electron-packager": "13.0.1"
   },
   "scripts": {
     "start": "electron .",
