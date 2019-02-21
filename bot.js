@@ -9,7 +9,6 @@ const Agent = require("socks-proxy-agent");
 
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
-const nircmd = require("nircmd");
 
 let that = null;
 
@@ -35,6 +34,10 @@ Bot.prototype.sendInfo = (ctx, message, outbound) => {
     if (outbound === 1) {
         ctx.reply(message);
     }
+};
+
+Bot.prototype.isAuthorized = (ctx) => {
+    return (that.config.message.users.indexOf(ctx.from.id) >= 0)
 };
 
 Bot.prototype.startBasic = () => {
@@ -64,53 +67,61 @@ Bot.prototype.startSystem = () => {
      */
     that.bot.command("system", ctx => {
             that.sendInfo(ctx, "/system", 0);
-            systemApi.getInfo().then(
-                data => {
-                    let info = [
-                        "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
-                            last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
-                        "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
-                        "📊 " + data.memory.active + " of " + data.memory.total,
-                        "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
-                        "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
-                        "🔮 " + data.network.rx + "/" + data.network.tx
-                    ];
-                    ctx.replyWithHTML(info.join("\n")).catch(err => that.sendError(ctx, err));
-                    that.sendInfo(ctx, "Data sent", 2);
-                },
-                err => that.sendError(ctx, err)
-            )
+            if (!that.isAuthorized(ctx)) {
+                that.sendInfo(ctx, "Sorry :(", 1)
+            } else {
+                systemApi.getInfo().then(
+                    data => {
+                        let info = [
+                            "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
+                                last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
+                            "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
+                            "📊 " + data.memory.active + " of " + data.memory.total,
+                            "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+                            "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
+                            "🔮 " + data.network.rx + "/" + data.network.tx
+                        ];
+                        ctx.replyWithHTML(info.join("\n")).catch(err => that.sendError(ctx, err));
+                        that.sendInfo(ctx, "Data sent", 2);
+                    },
+                    err => that.sendError(ctx, err)
+                )
+            }
         }
     );
 
     that.bot.command("pc", ctx => {
             that.sendInfo(ctx, "/pc", 0);
-            ctx.reply("-----==== Press any button ====-----",
-                Markup.inlineKeyboard([
-                        [
-                            Markup.callbackButton("🔉", "pc-key-0xAE"),
-                            Markup.callbackButton("🔇", "pc-key-0xAD"),
-                            Markup.callbackButton("🔊", "pc-key-0xAF")
-                        ],
-                        [
-                            Markup.callbackButton("⏪", "pc-key-0xB1"),
-                            Markup.callbackButton("⏯", "pc-key-0xB3"),
-                            Markup.callbackButton("⏩", "pc-key-0xB0")
-                        ],
-                        [
-                            Markup.callbackButton("YT ❌ ", "pc-shortcut-0x11-0x57"),
-                            Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
-                            Markup.callbackButton("YT 🖥", "pc-key-0x46"),
-                        ],
-                        [
-                            Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
-                            Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
-                            Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27"),
+            if (!that.isAuthorized(ctx)) {
+                that.sendInfo(ctx, "Sorry :(", 1)
+            } else {
+                ctx.reply("-----==== Press any button ====-----",
+                    Markup.inlineKeyboard([
+                            [
+                                Markup.callbackButton("🔉", "pc-key-0xAE"),
+                                Markup.callbackButton("🔇", "pc-key-0xAD"),
+                                Markup.callbackButton("🔊", "pc-key-0xAF")
+                            ],
+                            [
+                                Markup.callbackButton("⏪", "pc-key-0xB1"),
+                                Markup.callbackButton("⏯", "pc-key-0xB3"),
+                                Markup.callbackButton("⏩", "pc-key-0xB0")
+                            ],
+                            [
+                                Markup.callbackButton("YT ❌ ", "pc-shortcut-0x11-0x57"),
+                                Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
+                                Markup.callbackButton("YT 🖥", "pc-key-0x46"),
+                            ],
+                            [
+                                Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
+                                Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
+                                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27"),
+                            ]
                         ]
-                    ]
-                ).extra()
-            );
-            that.sendInfo(ctx, "Data sent", 2);
+                    ).extra()
+                );
+                that.sendInfo(ctx, "Data sent", 2);
+            }
         }
     );
 
@@ -150,14 +161,18 @@ Bot.prototype.startSystem = () => {
 Bot.prototype.startCapture = () => {
     that.bot.command("screen", async ctx => {
         that.sendInfo(ctx, "/screen", 0);
-        let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
-        try {
-            await systemApi.getScreen(imageName);
-            await ctx.replyWithPhoto({source: fs.createReadStream(imageName)});
-            fs.unlinkSync(imageName);
-            that.sendInfo(ctx, "Data sent", 2);
-        } catch (err) {
-            that.sendError(ctx, err);
+        if (!that.isAuthorized(ctx)) {
+            that.sendInfo(ctx, "Sorry :(", 1)
+        } else {
+            let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
+            try {
+                await systemApi.getScreen(imageName);
+                await ctx.replyWithPhoto({source: fs.createReadStream(imageName)});
+                fs.unlinkSync(imageName);
+                that.sendInfo(ctx, "Data sent", 2);
+            } catch (err) {
+                that.sendError(ctx, err);
+            }
         }
     });
 };
@@ -165,21 +180,25 @@ Bot.prototype.startCapture = () => {
 Bot.prototype.startTorrent = () => {
     that.bot.command("torrent", ctx => {
             that.sendInfo(ctx, "/torrent", 0);
-            that.torrentApi.list().then(
-                torrents =>
-                    torrents.forEach(torrent =>
-                        ctx.reply(
-                            torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
-                            Markup.inlineKeyboard(
-                                [
-                                    Markup.callbackButton("🚾 remove", "torrent-remove-" + torrent.id)
-                                ]
-                            ).extra()
-                        )
-                    ),
-                err => that.sendError(ctx, err)
-            );
-            that.sendInfo(ctx, "Data sent", 2);
+            if (!that.isAuthorized(ctx)) {
+                that.sendInfo(ctx, "Sorry :(", 1)
+            } else {
+                that.torrentApi.list().then(
+                    torrents =>
+                        torrents.forEach(torrent =>
+                            ctx.reply(
+                                torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
+                                Markup.inlineKeyboard(
+                                    [
+                                        Markup.callbackButton("🚾 remove", "torrent-remove-" + torrent.id)
+                                    ]
+                                ).extra()
+                            )
+                        ),
+                    err => that.sendError(ctx, err)
+                );
+                that.sendInfo(ctx, "Data sent", 2);
+            }
         }
     );
 
@@ -208,10 +227,10 @@ Bot.prototype.startTorrent = () => {
                                 break;
 
                             case "shortcut":
-                                for (let i = 2; i<data.length; i++) {
+                                for (let i = 2; i < data.length; i++) {
                                     await systemApi.sendCommand(["sendkey", data[i], "down"]);
                                 }
-                                for (let i = 2; i<data.length; i++) {
+                                for (let i = 2; i < data.length; i++) {
                                     await systemApi.sendCommand(["sendkey", data[i], "up"]);
                                 }
                                 await ctx.answerCbQuery("🆗");
@@ -246,11 +265,15 @@ Bot.prototype.startTorrent = () => {
      */
     that.bot.on("document", async ctx => {
         that.sendInfo(ctx, "File received", 0);
-        try {
-            await that.torrentApi.add(await that.bot.telegram.getFileLink(ctx.message.document.file_id));
-            that.sendInfo(ctx, "OK. Type /torrent to see all", 1);
-        } catch (err) {
-            that.sendError(ctx, err)
+        if (!that.isAuthorized(ctx)) {
+            that.sendInfo(ctx, "Sorry :(", 1)
+        } else {
+            try {
+                await that.torrentApi.add(await that.bot.telegram.getFileLink(ctx.message.document.file_id));
+                that.sendInfo(ctx, "OK. Type /torrent to see all", 1);
+            } catch (err) {
+                that.sendError(ctx, err)
+            }
         }
     });
 };

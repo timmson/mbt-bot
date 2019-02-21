@@ -2,15 +2,15 @@ module.exports = {
     message: {
         token: "<your token>",
         polling: true,
-        socksProxy: "<tor IP>",
-        socksPort: <tor port>,
-        owner: 1,
-        users: [1, 2]
+        owner: <your id>,
+        users: [<your id1>, <your id2>, ...]
     },
     torrent: {
       host: "<transmission IP>",
       port: <transmission port>,
       downloadDir: "<your download dir>"
     },
-    temporaryPath: "/tmp",
+        socks: "socks://<tor ip>:<tor host>",
+        webDir: "web",
+        temporaryPath: "tmp",
 };
