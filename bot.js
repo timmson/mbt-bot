@@ -108,7 +108,7 @@ Bot.prototype.startSystem = () => {
                                 Markup.callbackButton("⏩", "pc-key-0xB0")
                             ],
                             [
-                                Markup.callbackButton("YT ❌ ", "pc-shortcut-0x11-0x57"),
+                                Markup.callbackButton("📸", "pc-screen"),
                                 Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
                                 Markup.callbackButton("YT 🖥", "pc-key-0x46"),
                             ],
@@ -156,25 +156,6 @@ Bot.prototype.startSystem = () => {
 //bot.command("net"
 
 //bot.command("camera"
-};
-
-Bot.prototype.startCapture = () => {
-    that.bot.command("screen", async ctx => {
-        that.sendInfo(ctx, "/screen", 0);
-        if (!that.isAuthorized(ctx)) {
-            that.sendInfo(ctx, "Sorry :(", 1)
-        } else {
-            let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
-            try {
-                await systemApi.getScreen(imageName);
-                await ctx.replyWithPhoto({source: fs.createReadStream(imageName)});
-                fs.unlinkSync(imageName);
-                that.sendInfo(ctx, "Data sent", 2);
-            } catch (err) {
-                that.sendError(ctx, err);
-            }
-        }
-    });
 };
 
 Bot.prototype.startTorrent = () => {
@@ -239,6 +220,20 @@ Bot.prototype.startTorrent = () => {
                             case "command":
                                 await systemApi.sendCommand(data[2]);
                                 await ctx.answerCbQuery("🆗");
+                                break;
+
+                            case "screen" :
+                                let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
+                                try {
+                                    await systemApi.getScreen(imageName);
+                                    await ctx.replyWithPhoto({source: fs.createReadStream(imageName)});
+                                    fs.unlinkSync(imageName);
+                                    that.sendInfo(ctx, "Data sent", 2);
+                                    await ctx.answerCbQuery("🆗");
+                                } catch (err) {
+                                    await ctx.answerCbQuery("⚠");
+                                    that.sendError(ctx, err);
+                                }
                                 break;
                             default:
                                 await ctx.answerCbQuery("⚠");
