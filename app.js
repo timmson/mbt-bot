@@ -10,6 +10,8 @@ let tray = null;
 let bot = null;
 let log = null;
 
+let position = {};
+
 function Log(sender) {
     this.sender = sender;
 
@@ -26,7 +28,20 @@ function Log(sender) {
     };
 }
 
-let position = {};
+// toggle window
+const toggleWindow = () => {
+    if (window.isVisible()) {
+        window.hide();
+    } else {
+        showWindow();
+    }
+};
+
+const showWindow = () => {
+    window.setPosition(position[0], position[1], false);
+    window.show();
+    window.focus();
+};
 
 app.once("ready", () => {
 
@@ -74,22 +89,6 @@ app.once("ready", () => {
     console.log("Please press [CTRL + C] to stop");
 
 });
-
-// toggle window
-const toggleWindow = () => {
-    if (window.isVisible()) {
-        window.hide();
-    } else {
-        showWindow();
-    }
-};
-
-const showWindow = () => {
-    window.setPosition(position[0], position[1], false);
-    window.show();
-    window.focus();
-};
-
 
 process.on("SIGINT", () => {
     console.log("Bot has stopped");

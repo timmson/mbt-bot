@@ -18,8 +18,8 @@ function Torrent(config) {
 Torrent.prototype.list = function () {
     return new Promise(async (resolve, reject) => {
         try {
-            let response = await that.transmission.get(undefined);
-            resolve(response.torrents.map(t => new Object({
+            let response = await that.transmission.get(null);
+            resolve(response.torrents.map((t) => new Object({
                 "id": t.id,
                 "name": t.name,
                 "percentDone": parseInt(parseFloat(t.percentDone) * 100) + "%",
@@ -35,17 +35,17 @@ Torrent.prototype.list = function () {
 Torrent.prototype.add = function (url) {
     return new Promise((resolve, reject) => {
         let stream = request.get({
-                url: url,
+                url,
                 agent: new Agent(that.config.socks)
             }
         ).pipe(fs.createWriteStream(that.config.torrent.downloadDir + new Date().getTime() + ".torrent"));
 
         stream.on("finish", () => {
-            resolve("OK")
+            resolve("OK");
         });
 
         stream.on("error", (error) => {
-            reject(error)
+            reject(error);
         });
     });
 };

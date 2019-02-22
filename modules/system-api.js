@@ -33,9 +33,9 @@ class SystemApi {
                 data.process = Object.keys(data.process).map(p => new Object({
                     cpu: Math.floor(data.process[p].pcpu),
                     command: data.process[p].command
-                })).filter(row => row.cpu !== 0).sort((a, b) => a.cpu <= b.cpu).slice(0, 3).reverse();
+                })).filter((row) => row.cpu !== 0).sort((a, b) => a.cpu <= b.cpu).slice(0, 3).reverse();
 
-                data.storage = (await si.fsSize()).map(row => new Object({
+                data.storage = (await si.fsSize()).map((row) => new Object({
                         size: bytes(parseInt(row.size, 10)),
                         used: bytes(row.used),
                     })
