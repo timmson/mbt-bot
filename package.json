@@ -12,19 +12,23 @@
     "nircmd": "2.0.0",
     "request": "2.87.0",
     "request-promise": "4.2.2",
-    "sercomm-rv6699": "0.8.0",
+    "sercomm-rv6699": "0.8.1",
     "socks-proxy-agent": "4.0.1",
     "systeminformation": "4.0.10",
     "telegraf": "3.27.1",
     "transmission-promise": "1.1.2"
   },
   "devDependencies": {
+    "chai": "4.2.0",
     "electron": "4.0.5",
-    "electron-packager": "13.0.1"
+    "electron-packager": "13.0.1",
+    "mocha": "6.0.1"
   },
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager . --ignore .idea --overwrite --out bin"
+    "package": "electron-packager . --ignore .idea --overwrite --out bin",
+    "test": "mocha",
+    "coverage": "nyc mocha && nyc report --reporter=text-lcov > coverage.lcov"
   },
   "repository": {
     "type": "git",
@@ -36,5 +40,5 @@
     "node"
   ],
   "author": "timmson",
-  "license": "GPL-3.0"
+  "license": "MIT"
 }

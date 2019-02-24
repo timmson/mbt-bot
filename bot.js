@@ -164,7 +164,7 @@ Bot.prototype.startSystem = () => {
             try {
                 let list = await that.srvCommApi.getDeviceList();
                 ctx.reply(list.reduce((p, i) => p + "\n" + [
-                    i.hostname || (i.ip + " " + i.mac),
+                    (i.hostname != null && i.hostname !== "--") ? i.hostname : i.ip + " " + i.mac,
                     i.alive === "Y" ? "🌞" : ("🌙" + i.last_see_time)
                 ].join("  -  "), ""));
                 that.sendInfo(ctx, "Data sent, size=" + JSON.stringify(list), 2);
