@@ -9,6 +9,7 @@ Author: [timmson666@mail.ru](mailto:timmson666@mail.ru)
 ### Commands
 ```
 about - About
+net - List network devices
 pc - Get PC remote
 screen - Take the screenshot
 start - Start

@@ -5,12 +5,17 @@ module.exports = {
         owner: <your id>,
         users: [<your id1>, <your id2>, ...]
     },
+    router: {
+        url: "http://<your-route-ip>",
+        login: <login>,
+        password: <password>
+    },
     torrent: {
       host: "<transmission IP>",
       port: <transmission port>,
       downloadDir: "<your download dir>"
     },
-        socks: "socks://<tor ip>:<tor host>",
-        webDir: "web",
-        temporaryPath: "tmp",
+    socks: "socks://<tor ip>:<tor host>",
+    webDir: "web",
+    temporaryPath: "tmp",
 };

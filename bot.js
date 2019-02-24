@@ -10,12 +10,15 @@ const Agent = require("socks-proxy-agent");
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
 
+const SerCommApi = require("sercomm-rv6699");
+
 let that = null;
 
 function Bot(config, log) {
     this.config = config;
     this.log = log;
     this.torrentApi = new TorrentApi(config);
+    this.srvCommApi = new SerCommApi(config.router);
     this.bot = new Telegraf(config.message.token, {
         telegram: {
             agent: new Agent(config.socks)
@@ -93,7 +96,7 @@ Bot.prototype.startSystem = () => {
     that.bot.command("pc", ctx => {
             that.sendInfo(ctx, "/pc", 0);
             if (!that.isAuthorized(ctx)) {
-                that.sendInfo(ctx, "Sorry :(", 1)
+                that.sendInfo(ctx, "Sorry :(", 1);
             } else {
                 ctx.reply("-----==== Press any button ====-----",
                     Markup.inlineKeyboard([
@@ -153,7 +156,23 @@ Bot.prototype.startSystem = () => {
 //                 }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
 //             break;
 
-//bot.command("net"
+    that.bot.command("net", async (ctx) => {
+        that.sendInfo(ctx, "/net", 0);
+        if (!that.isAuthorized(ctx)) {
+            that.sendInfo(ctx, "Sorry :(", 1);
+        } else {
+            try {
+                let list = await that.srvCommApi.getDeviceList();
+                ctx.reply(list.reduce((p, i) => p + "\n" + [
+                    i.hostname || (i.ip + " " + i.mac),
+                    i.alive === "Y" ? "🌞" : ("🌙" + i.last_see_time)
+                ].join("  -  "), ""));
+                that.sendInfo(ctx, "Data sent, size=" + JSON.stringify(list), 2);
+            } catch (err) {
+                that.sendError(ctx, err)
+            }
+        }
+    });
 
 //bot.command("camera"
 };
@@ -276,7 +295,6 @@ Bot.prototype.startTorrent = () => {
 Bot.prototype.start = () => {
     that.startBasic();
     that.startSystem();
-    that.startCapture();
     that.startTorrent();
 
     that.bot.startPolling();
