@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 
 const TorrentApi = require("./modules/torrent-api");
+const TvApi = require("./modules/tv-api");
 const systemApi = require("./modules/system-api");
 const Agent = require("socks-proxy-agent");
 
@@ -18,6 +19,7 @@ function Bot(config, log) {
     this.config = config;
     this.log = log;
     this.torrentApi = new TorrentApi(config);
+    this.tvApi = new TvApi(config.tv);
     this.srvCommApi = new SerCommApi(config.router);
     this.bot = new Telegraf(config.message.token, {
         telegram: {
@@ -136,8 +138,8 @@ Bot.prototype.startSystem = () => {
             try {
                 let list = await that.srvCommApi.getDeviceList();
                 ctx.reply(list.reduce((p, i) => p + "\n" + [
-                    (i.hostname != null && i.hostname !== "--") ? i.hostname : i.ip + " " + i.mac,
-                    i.alive === "Y" ? "🌞" : ("🌙" + i.last_see_time)
+                    (i.hostname != null && i.hostname !== "--") ? i.hostname : i.ip + " [" + i.mac + "]",
+                    i.alive === "Y" ? "🌞 " + i.active_time + " Already" : ("🌙 " + i.last_see_time)
                 ].join("  -  "), ""));
                 that.sendInfo(ctx, "Data sent, size=" + JSON.stringify(list), 2);
             } catch (err) {
@@ -260,7 +262,8 @@ Bot.prototype.startTorrent = () => {
 
                     case "tv":
                         try {
-                            //await that.tvApi.command(data[1], data.slice(2, data.length - 1).join("-"));
+                            console.log(data[1] + " " + data.slice(2).join("-"));
+                            await that.tvApi.command(data[1], data.slice(2).join("-"));
                             await ctx.answerCbQuery("🆗");
                         } catch (err) {
                             await ctx.answerCbQuery("⚠");
