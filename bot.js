@@ -113,12 +113,12 @@ Bot.prototype.startSystem = () => {
                             [
                                 Markup.callbackButton("📸", "pc-screen"),
                                 Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
-                                Markup.callbackButton("YT 🖥", "pc-key-0x46"),
+                                Markup.callbackButton("YT 🖥", "pc-key-0x46")
                             ],
                             [
                                 Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
                                 Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
-                                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27"),
+                                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
                             ]
                         ]
                     ).extra()
@@ -127,34 +127,6 @@ Bot.prototype.startSystem = () => {
             }
         }
     );
-
-    /**
-     * TV
-     */
-//        case "/tv28":
-//             messageApi.sendText(to, "-----==== Press any button ====-----",
-//                 {
-//                     reply_markup: JSON.stringify({
-//                         inline_keyboard: [
-//                             [{
-//                                 text: "🔇",
-//                                 callback_data: "tv/lg28-pc/mute"
-//                             }, {
-//                                 text: "🔴",
-//                                 callback_data: "tv/lg28-pc/power-off"
-//                             }],
-//                             [{text: "🔊", callback_data: "tv/lg28-pc/volume-up"}, {
-//                                 text: "🔼",
-//                                 callback_data: "tv/lg28-pc/channel-up"
-//                             }],
-//                             [{text: "🔉", callback_data: "tv/lg28-pc/volume-down"}, {
-//                                 text: "🔽",
-//                                 callback_data: "tv/lg28-pc/channel-down"
-//                             }]
-//                         ]
-//                     })
-//                 }).catch(err => log.error(err) & messageApi.sendText(to, err.toString()));
-//             break;
 
     that.bot.command("net", async (ctx) => {
         that.sendInfo(ctx, "/net", 0);
@@ -174,7 +146,33 @@ Bot.prototype.startSystem = () => {
         }
     });
 
-//bot.command("camera"
+};
+
+Bot.prototype.startTV = () => {
+    that.bot.command("tv", ctx => {
+            that.sendInfo(ctx, "/tv", 0);
+            if (!that.isAuthorized(ctx)) {
+                that.sendInfo(ctx, "Sorry :(", 1);
+            } else {
+                ctx.reply("-----==== Press any button ====-----",
+                    Markup.inlineKeyboard([
+                            [
+                                Markup.callbackButton("🔉", "tv-lg28-volume-down"),
+                                Markup.callbackButton("🔇", "tv-lg28-mute"),
+                                Markup.callbackButton("🔊", "tv-lg28-volume-up")
+                            ],
+                            [
+                                Markup.callbackButton("⬅", "tv-lg28-channel-down"),
+                                Markup.callbackButton("🔴", "tv-lg28-power-off"),
+                                Markup.callbackButton("➡", "tv-lg28-channel-up")
+                            ],
+                        ]
+                    ).extra()
+                );
+                that.sendInfo(ctx, "Data sent", 2);
+            }
+        }
+    );
 };
 
 Bot.prototype.startTorrent = () => {
@@ -260,6 +258,16 @@ Bot.prototype.startTorrent = () => {
                         }
                         break;
 
+                    case "tv":
+                        try {
+                            //await that.tvApi.command(data[1], data.slice(2, data.length - 1).join("-"));
+                            await ctx.answerCbQuery("🆗");
+                        } catch (err) {
+                            await ctx.answerCbQuery("⚠");
+                            that.sendError(ctx, err);
+                        }
+                        break;
+
                     default:
                         await ctx.answerCbQuery("⚠");
                         break;
@@ -295,6 +303,7 @@ Bot.prototype.startTorrent = () => {
 Bot.prototype.start = () => {
     that.startBasic();
     that.startSystem();
+    that.startTV();
     that.startTorrent();
 
     that.bot.startPolling();
