@@ -13,7 +13,7 @@
     "nircmd": "2.0.0",
     "request": "2.87.0",
     "request-promise": "4.2.2",
-    "sercomm-rv6699": "0.8.1",
+    "sercomm-rv6699": "0.8.2",
     "socks-proxy-agent": "4.0.1",
     "systeminformation": "4.0.10",
     "telegraf": "3.27.1",
