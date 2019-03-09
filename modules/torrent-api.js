@@ -19,13 +19,16 @@ Torrent.prototype.list = function () {
   return new Promise(async (resolve, reject) => {
     try {
       let response = await that.transmission.get(null);
-      resolve(response.torrents.map((t) => new Object({
-        "id": t.id,
-        "name": t.name,
-        "percentDone": parseInt(parseFloat(t.percentDone) * 100) + "%",
-        "sizeWhenDone": bytes(t.sizeWhenDone),
-        "status": t.status === 6 ? "done" : t.status
-      })));
+      resolve(response.torrents.map(t => {
+          return {
+            "id": t.id,
+            "name": t.name,
+            "percentDone": parseInt(parseFloat(t.percentDone) * 100) + "%",
+            "sizeWhenDone": bytes(t.sizeWhenDone),
+            "status": t.status === 6 ? "done" : t.status
+          };
+        })
+      );
     } catch (err) {
       reject(err);
     }
