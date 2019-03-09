@@ -36,7 +36,6 @@ TvApi.prototype.listCommand = function () {
     return Object.keys(COMMAND_MAP);
 };
 
-
 TvApi.prototype.command = function (tvName, command) {
     return new Promise((resolve, reject) => {
             let tvType = that.tvList[tvName].type;
@@ -65,7 +64,6 @@ TvApi.prototype.command = function (tvName, command) {
                     reject(new Error("Wrong tvName was given - " + tvName));
                     break;
             }
-
         }
     );
 };
