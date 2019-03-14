@@ -7,6 +7,7 @@ const TorrentApi = require("./modules/torrent-api");
 const TvApi = require("./modules/tv-api");
 const systemApi = require("./modules/system-api");
 const Agent = require("socks-proxy-agent");
+const temper = require("node-temper");
 
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
@@ -94,6 +95,18 @@ Bot.prototype.startSystem = () => {
       }
     }
   );
+
+  that.bot.command("temperature", (ctx) => {
+    that.sendInfo(ctx, "/temperature", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      temper().then(
+        data => ctx.reply(data.out + "°C"),
+        err => that.sendError(ctx, err)
+      );
+    }
+  });
 
   that.bot.command("pc", (ctx) => {
       that.sendInfo(ctx, "/pc", 0);
