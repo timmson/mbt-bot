@@ -1,5 +1,6 @@
 const bytes = require("bytes");
 const fs = require("fs");
+const path = require("path");
 const request = require("request");
 const Agent = require("socks-proxy-agent");
 const Transmission = require("transmission-promise");
@@ -15,17 +16,23 @@ function Torrent (config) {
   that = this;
 }
 
-Torrent.prototype.list = function () {
+Torrent.prototype.list = function (id) {
   return new Promise(async (resolve, reject) => {
     try {
-      let response = await that.transmission.get(null);
-      resolve(response.torrents.map(t => {
+      let response = await that.transmission.get(id ? parseInt(id, 10) : null);
+      resolve(response.torrents.map((t) => {
           return {
-            "id": t.id,
-            "name": t.name,
-            "percentDone": parseInt(parseFloat(t.percentDone) * 100) + "%",
-            "sizeWhenDone": bytes(t.sizeWhenDone),
-            "status": t.status === 6 ? "done" : t.status
+            id: t.id,
+            name: t.name,
+            percentDone: parseInt(parseFloat(t.percentDone) * 100) + "%",
+            sizeWhenDone: bytes(t.sizeWhenDone),
+            status: t.status === 6 ? "done" : t.status,
+            files: t.files.map((f) => {
+                return {
+                  name: path.join(that.config.torrent.doneDir, f.name),
+                  sizeWhenDone: bytes(f.length)
+                }
+            })
           };
         })
       );

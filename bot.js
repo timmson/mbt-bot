@@ -16,6 +16,8 @@ const SerCommApi = require("sercomm-rv6699");
 
 let that = null;
 
+let fileRegistry = {};
+
 function Bot (config, log) {
   this.config = config;
   this.log = log;
@@ -202,7 +204,8 @@ Bot.prototype.startTorrent = () => {
                 torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
                 Markup.inlineKeyboard(
                   [
-                    Markup.callbackButton("🚾 remove", "torrent-remove-" + torrent.id)
+                    Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
+                    Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
                   ]
                 ).extra()
               )
@@ -223,6 +226,32 @@ Bot.prototype.startTorrent = () => {
             if (data[1] === "remove") {
               await that.torrentApi.remove(data[2]);
               await ctx.editMessageText("[removed]");
+            } else if (data[1] === "list") {
+              let torrents = await that.torrentApi.list(data[2]);
+              torrents[0].files.forEach(async (file) => {
+                  try {
+                    let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000);
+                    fileRegistry[fileId] = file.name;
+                    await ctx.reply(path.basename(file.name) + "\n" + file.sizeWhenDone,
+                      Markup.inlineKeyboard([
+                          Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)
+                        ]
+                      ).extra()
+                    );
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
+              );
+              await ctx.answerCbQuery("🆗");
+            } else if (data[1] === "download") {
+              let fileName = fileRegistry[data[2]];
+              console.log(fileName);
+              await ctx.replyWithDocument({
+                source: fs.createReadStream(fileName),
+                filename: path.basename(fileName)
+              });
+              await ctx.answerCbQuery("🆗");
             } else {
               await ctx.answerCbQuery("⚠");
             }
@@ -266,7 +295,6 @@ Bot.prototype.startTorrent = () => {
             break;
           case "tv":
             try {
-              console.log(data[1] + " " + data.slice(2).join("-"));
               await that.tvApi.command(data[1], data.slice(2).join("-"));
               await ctx.answerCbQuery("🆗");
             } catch (err) {
