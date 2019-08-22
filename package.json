@@ -12,7 +12,7 @@
     "lgtv2": "1.4.1",
     "moment": "2.24.0",
     "nircmd": "2.0.0",
-    "node-temper": "1.0.5",
+    "node-temper": "1.0.6",
     "request": "2.87.0",
     "request-promise": "4.2.4",
     "sercomm-rv6699": "0.8.4",
