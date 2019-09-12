@@ -39,7 +39,7 @@
   "scripts": {
     "start": "electron .",
     "package": "electron-packager . --ignore .idea --overwrite --out bin",
-    "lint": "npx eslint app.js bot.js ./modules /test /web",
+    "lint": "npx eslint app.js bot.js ./modules ./test ./web",
     "test": "mocha",
     "coverage": "nyc mocha && nyc report --reporter=text-lcov > coverage.lcov"
   },
