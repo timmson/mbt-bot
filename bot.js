@@ -74,28 +74,28 @@ Bot.prototype.startSystem = () => {
    * TODO Add Net
    */
   that.bot.command("system", (ctx) => {
-      that.sendInfo(ctx, "/system", 0);
-      if (!that.isAuthorized(ctx)) {
-        that.sendInfo(ctx, "Sorry :(", 1);
-      } else {
-        systemApi.getInfo().then(
-          data => {
-            let info = [
-              "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
-                last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
-              "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
-              "📊 " + data.memory.active + " of " + data.memory.total,
-              "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
-              "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
-              "🔮 " + data.network.rx + "/" + data.network.tx
-            ];
-            ctx.replyWithHTML(info.join("\n")).catch((err) => that.sendError(ctx, err));
-            that.sendInfo(ctx, "Data sent", 2);
-          },
-          (err) => that.sendError(ctx, err)
-        );
-      }
+    that.sendInfo(ctx, "/system", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      systemApi.getInfo().then(
+        data => {
+          let info = [
+            "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
+              last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
+            "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃",
+            "📊 " + data.memory.active + " of " + data.memory.total,
+            "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+            "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
+            "🔮 " + data.network.rx + "/" + data.network.tx
+          ];
+          ctx.replyWithHTML(info.join("\n")).catch((err) => that.sendError(ctx, err));
+          that.sendInfo(ctx, "Data sent", 2);
+        },
+        (err) => that.sendError(ctx, err)
+      );
     }
+  }
   );
 
   that.bot.command("temperature", (ctx) => {
@@ -111,38 +111,38 @@ Bot.prototype.startSystem = () => {
   });
 
   that.bot.command("pc", (ctx) => {
-      that.sendInfo(ctx, "/pc", 0);
-      if (!that.isAuthorized(ctx)) {
-        that.sendInfo(ctx, "Sorry :(", 1);
-      } else {
-        ctx.reply("-----==== Press any button ====-----",
-          Markup.inlineKeyboard([
-              [
-                Markup.callbackButton("🔉", "pc-key-0xAE"),
-                Markup.callbackButton("🔇", "pc-key-0xAD"),
-                Markup.callbackButton("🔊", "pc-key-0xAF")
-              ],
-              [
-                Markup.callbackButton("⏪", "pc-key-0xB1"),
-                Markup.callbackButton("⏯", "pc-key-0xB3"),
-                Markup.callbackButton("⏩", "pc-key-0xB0")
-              ],
-              [
-                Markup.callbackButton("📸", "pc-screen"),
-                Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
-                Markup.callbackButton("YT 🖥", "pc-key-0x46")
-              ],
-              [
-                Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
-                Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
-                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
-              ]
-            ]
-          ).extra()
-        );
-        that.sendInfo(ctx, "Data sent", 2);
-      }
+    that.sendInfo(ctx, "/pc", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      ctx.reply("-----==== Press any button ====-----",
+        Markup.inlineKeyboard([
+          [
+            Markup.callbackButton("🔉", "pc-key-0xAE"),
+            Markup.callbackButton("🔇", "pc-key-0xAD"),
+            Markup.callbackButton("🔊", "pc-key-0xAF")
+          ],
+          [
+            Markup.callbackButton("⏪", "pc-key-0xB1"),
+            Markup.callbackButton("⏯", "pc-key-0xB3"),
+            Markup.callbackButton("⏩", "pc-key-0xB0")
+          ],
+          [
+            Markup.callbackButton("📸", "pc-screen"),
+            Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
+            Markup.callbackButton("YT 🖥", "pc-key-0x46")
+          ],
+          [
+            Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
+            Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
+            Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
+          ]
+        ]
+        ).extra()
+      );
+      that.sendInfo(ctx, "Data sent", 2);
     }
+  }
   );
 
   that.bot.command("net", async (ctx) => {
@@ -166,152 +166,152 @@ Bot.prototype.startSystem = () => {
 
 Bot.prototype.startTV = () => {
   that.bot.command("tv", (ctx) => {
-      that.sendInfo(ctx, "/tv", 0);
-      if (!that.isAuthorized(ctx)) {
-        that.sendInfo(ctx, "Sorry :(", 1);
-      } else {
-        ctx.reply("-----==== Press any button ====-----",
-          Markup.inlineKeyboard([
-              [
-                Markup.callbackButton("🔉", "tv-lg28-volume-down"),
-                Markup.callbackButton("🔇", "tv-lg28-mute"),
-                Markup.callbackButton("🔊", "tv-lg28-volume-up")
-              ],
-              [
-                Markup.callbackButton("⬅", "tv-lg28-channel-down"),
-                Markup.callbackButton("🔴", "tv-lg28-power-off"),
-                Markup.callbackButton("➡", "tv-lg28-channel-up")
-              ]
-            ]
-          ).extra()
-        );
-        that.sendInfo(ctx, "Data sent", 2);
-      }
+    that.sendInfo(ctx, "/tv", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      ctx.reply("-----==== Press any button ====-----",
+        Markup.inlineKeyboard([
+          [
+            Markup.callbackButton("🔉", "tv-lg28-volume-down"),
+            Markup.callbackButton("🔇", "tv-lg28-mute"),
+            Markup.callbackButton("🔊", "tv-lg28-volume-up")
+          ],
+          [
+            Markup.callbackButton("⬅", "tv-lg28-channel-down"),
+            Markup.callbackButton("🔴", "tv-lg28-power-off"),
+            Markup.callbackButton("➡", "tv-lg28-channel-up")
+          ]
+        ]
+        ).extra()
+      );
+      that.sendInfo(ctx, "Data sent", 2);
     }
+  }
   );
 };
 
 Bot.prototype.startTorrent = () => {
   that.bot.command("torrent", (ctx) => {
-      that.sendInfo(ctx, "/torrent", 0);
-      if (!that.isAuthorized(ctx)) {
-        that.sendInfo(ctx, "Sorry :(", 1);
-      } else {
-        that.torrentApi.list().then(
-          (torrents) =>
-            torrents.forEach(torrent =>
-              ctx.reply(
-                torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
-                Markup.inlineKeyboard(
-                  [
-                    Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
-                    Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
-                  ]
-                ).extra()
-              )
-            ),
-          (err) => that.sendError(ctx, err)
-        );
-        that.sendInfo(ctx, "Data sent", 2);
-      }
+    that.sendInfo(ctx, "/torrent", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      that.torrentApi.list().then(
+        (torrents) =>
+          torrents.forEach(torrent =>
+            ctx.reply(
+              torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
+              Markup.inlineKeyboard(
+                [
+                  Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
+                  Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
+                ]
+              ).extra()
+            )
+          ),
+        (err) => that.sendError(ctx, err)
+      );
+      that.sendInfo(ctx, "Data sent", 2);
     }
+  }
   );
 
   that.bot.on("callback_query", async (ctx) => {
-      try {
-        that.sendInfo(ctx, ctx.callbackQuery.data, 0);
-        let data = ctx.callbackQuery.data.split("-");
-        switch (data[0]) {
-          case "torrent":
-            if (data[1] === "remove") {
-              await that.torrentApi.remove(data[2]);
-              await ctx.editMessageText("[removed]");
-            } else if (data[1] === "list") {
-              let torrents = await that.torrentApi.list(data[2]);
-              torrents[0].files.forEach(async (file) => {
-                  try {
-                    let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000);
-                    fileRegistry[fileId] = file.name;
-                    await ctx.reply(path.basename(file.name) + "\n" + file.sizeWhenDone,
-                      Markup.inlineKeyboard([
-                          Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)
-                        ]
-                      ).extra()
-                    );
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }
-              );
-              await ctx.answerCbQuery("🆗");
-            } else if (data[1] === "download") {
-              let fileName = fileRegistry[data[2]];
-              console.log(fileName);
-              await ctx.replyWithDocument({
-                source: fs.createReadStream(fileName),
-                filename: path.basename(fileName)
-              });
-              await ctx.answerCbQuery("🆗");
-            } else {
-              await ctx.answerCbQuery("⚠");
+    try {
+      that.sendInfo(ctx, ctx.callbackQuery.data, 0);
+      let data = ctx.callbackQuery.data.split("-");
+      switch (data[0]) {
+        case "torrent":
+          if (data[1] === "remove") {
+            await that.torrentApi.remove(data[2]);
+            await ctx.editMessageText("[removed]");
+          } else if (data[1] === "list") {
+            let torrents = await that.torrentApi.list(data[2]);
+            torrents[0].files.forEach(async (file) => {
+              try {
+                let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000);
+                fileRegistry[fileId] = file.name;
+                await ctx.reply(path.basename(file.name) + "\n" + file.sizeWhenDone,
+                  Markup.inlineKeyboard([
+                    Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)
+                  ]
+                  ).extra()
+                );
+              } catch (err) {
+                console.error(err);
+              }
             }
-            break;
-          case "pc":
-            switch (data[1]) {
-              case "key":
-                await systemApi.sendKey(data[2]);
-                await ctx.answerCbQuery("🆗");
-                break;
-              case "shortcut":
-                for (let i = 2; i < data.length; i++) {
-                  await systemApi.sendCommand(["sendkey", data[i], "down"]);
-                }
-                for (let i = 2; i < data.length; i++) {
-                  await systemApi.sendCommand(["sendkey", data[i], "up"]);
-                }
-                await ctx.answerCbQuery("🆗");
-                break;
-              case "command":
-                await systemApi.sendCommand(data[2]);
-                await ctx.answerCbQuery("🆗");
-                break;
-              case "screen" :
-                let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
-                try {
-                  await systemApi.getScreen(imageName);
-                  await ctx.replyWithPhoto({ source: fs.createReadStream(imageName) });
-                  fs.unlinkSync(imageName);
-                  that.sendInfo(ctx, "Data sent", 2);
-                  await ctx.answerCbQuery("🆗");
-                } catch (err) {
-                  await ctx.answerCbQuery("⚠");
-                  that.sendError(ctx, err);
-                }
-                break;
-              default:
-                await ctx.answerCbQuery("⚠");
-                break;
-            }
-            break;
-          case "tv":
-            try {
-              await that.tvApi.command(data[1], data.slice(2).join("-"));
-              await ctx.answerCbQuery("🆗");
-            } catch (err) {
-              await ctx.answerCbQuery("⚠");
-              that.sendError(ctx, err);
-            }
-            break;
-          default:
+            );
+            await ctx.answerCbQuery("🆗");
+          } else if (data[1] === "download") {
+            let fileName = fileRegistry[data[2]];
+            console.log(fileName);
+            await ctx.replyWithDocument({
+              source: fs.createReadStream(fileName),
+              filename: path.basename(fileName)
+            });
+            await ctx.answerCbQuery("🆗");
+          } else {
             await ctx.answerCbQuery("⚠");
-            break;
-        }
-        that.sendInfo(ctx, "Data sent", 2);
-      } catch (err) {
-        console.error(err);
-        ctx.answerCbQuery("⛔️" + err.toString()).catch((err) => that.sendError(ctx, err));
+          }
+          break;
+        case "pc":
+          switch (data[1]) {
+            case "key":
+              await systemApi.sendKey(data[2]);
+              await ctx.answerCbQuery("🆗");
+              break;
+            case "shortcut":
+              for (let i = 2; i < data.length; i++) {
+                await systemApi.sendCommand(["sendkey", data[i], "down"]);
+              }
+              for (let i = 2; i < data.length; i++) {
+                await systemApi.sendCommand(["sendkey", data[i], "up"]);
+              }
+              await ctx.answerCbQuery("🆗");
+              break;
+            case "command":
+              await systemApi.sendCommand(data[2]);
+              await ctx.answerCbQuery("🆗");
+              break;
+            case "screen" :
+              let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg");
+              try {
+                await systemApi.getScreen(imageName);
+                await ctx.replyWithPhoto({ source: fs.createReadStream(imageName) });
+                fs.unlinkSync(imageName);
+                that.sendInfo(ctx, "Data sent", 2);
+                await ctx.answerCbQuery("🆗");
+              } catch (err) {
+                await ctx.answerCbQuery("⚠");
+                that.sendError(ctx, err);
+              }
+              break;
+            default:
+              await ctx.answerCbQuery("⚠");
+              break;
+          }
+          break;
+        case "tv":
+          try {
+            await that.tvApi.command(data[1], data.slice(2).join("-"));
+            await ctx.answerCbQuery("🆗");
+          } catch (err) {
+            await ctx.answerCbQuery("⚠");
+            that.sendError(ctx, err);
+          }
+          break;
+        default:
+          await ctx.answerCbQuery("⚠");
+          break;
       }
+      that.sendInfo(ctx, "Data sent", 2);
+    } catch (err) {
+      console.error(err);
+      ctx.answerCbQuery("⛔️" + err.toString()).catch((err) => that.sendError(ctx, err));
     }
+  }
   );
 
   /**

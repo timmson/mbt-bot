@@ -1,4 +1,6 @@
 .idea/
-node_modules
-config.js
+.nyc_output
 bin
+config.js
+coverage.lcov
+node_modules

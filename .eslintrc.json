@@ -14,20 +14,23 @@
     "ecmaVersion": 2018
   },
   "rules": {
-    "semi": [
+    /*"indent": [
       "error",
-      "always"
+      "tab"
+    ],*/
+    "linebreak-style": [
+      "error",
+      "unix"
     ],
     "quotes": [
       "error",
       "double"
     ],
-    "indent": "off",
+    "semi": [
+      "error",
+      "always"
+    ],
     "space-before-function-paren": "off",
     "no-unused-expressions": "off"
-  },
-  "plugins": [
-    "chai-expect",
-    "chai-friendly"
-  ]
+  }
 }
