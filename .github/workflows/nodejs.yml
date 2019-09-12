@@ -27,4 +27,4 @@ jobs:
         npm run coverage && codecov
       env:
         CI: true
-        CODECOV_TOKEN: dde8134-9044-489d-b7c6-41267e493633
+        CODECOV_TOKEN: 5dde8134-9044-489d-b7c6-41267e493633
