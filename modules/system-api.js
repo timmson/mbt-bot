@@ -24,7 +24,7 @@ class SystemApi {
           os: await si.osInfo(),
           load: await si.currentLoad()
         };
-        data.sensors = await si.cpuTemperature();
+        //data.sensors = await si.cpuTemperature();
 
         data.memory = await si.mem();
         Object.keys(data.memory).forEach(key => {
@@ -48,8 +48,8 @@ class SystemApi {
         );
 
         data.network = await si.networkStats();
-        data.network.rx = bytes(data.network.rx);
-        data.network.tx = bytes(data.network.tx);
+        data.network.rx = bytes(data.network[0].rx_bytes);
+        data.network.tx = bytes(data.network[0].tx_bytes);
         resolve(data);
       } catch (error) {
         reject(error);
