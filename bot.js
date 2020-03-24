@@ -231,11 +231,9 @@ Bot.prototype.startTorrent = () => {
               torrents[0].files.forEach((file) => {
                   let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000);
                   fileRegistry[fileId] = file.name;
-                  ctx.reply(path.basename(file.name) + "\n" + file.sizeWhenDone,
-                    Markup.inlineKeyboard([
-                        Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)
-                      ]
-                    ).extra()
+                  ctx.reply(
+                    path.basename(file.name) + "\n" + file.sizeWhenDone,
+                    Markup.inlineKeyboard([Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)]).extra()
                   ).catch(err => console.error(err));
                 }
               );
@@ -243,11 +241,11 @@ Bot.prototype.startTorrent = () => {
             } else if (data[1] === "download") {
               let fileName = fileRegistry[data[2]];
               console.log(fileName);
+              await ctx.answerCbQuery("Wait. File is sending...");
               await ctx.replyWithDocument({
                 source: fs.createReadStream(fileName),
                 filename: path.basename(fileName)
               });
-              await ctx.answerCbQuery("🆗");
             } else {
               await ctx.answerCbQuery("⚠");
             }
