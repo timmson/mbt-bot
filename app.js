@@ -59,10 +59,15 @@ app.once("ready", () => {
     titleBarStyle: "hiddenInset",
     backgroundColor: "#000",
     show: false,
-    icon: path.join(__dirname, config.webDir, "icon.png")
+    icon: path.join(__dirname, config.webDir, "icon.png"),
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
   position = window.getPosition();
+
+  window.webContents.openDevTools();
 
   window.loadURL(url.format({
     pathname: path.join(__dirname, config.webDir, "index.html"),
