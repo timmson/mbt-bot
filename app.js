@@ -67,8 +67,6 @@ app.once("ready", () => {
 
   position = window.getPosition();
 
-  window.webContents.openDevTools();
-
   window.loadURL(url.format({
     pathname: path.join(__dirname, config.webDir, "index.html"),
     protocol: "file:",
