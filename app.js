@@ -65,6 +65,9 @@ app.once("ready", () => {
     }
   });
 
+  //window.webContents.openDevTools();
+  window.setMenuBarVisibility(false);
+
   position = window.getPosition();
 
   window.loadURL(url.format({
