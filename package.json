@@ -15,7 +15,7 @@
     "node-temper": "1.0.6",
     "request": "2.87.0",
     "request-promise": "4.2.4",
-    "sercomm-rv6699": "0.8.4",
+    "sercomm-rv6699": "0.8.5",
     "socks-proxy-agent": "4.0.1",
     "systeminformation": "4.0.10",
     "telegraf": "3.27.1",
