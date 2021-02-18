@@ -24,7 +24,6 @@ const COMMAND_MAP = {
 };
 
 class TvAPI {
-
   constructor (tvList) {
     this.tvList = tvList;
     that = this;
@@ -40,36 +39,35 @@ class TvAPI {
 
   command (tvName, command) {
     return new Promise((resolve, reject) => {
-        let tvType = that.tvList[tvName].type;
-        let cmd = COMMAND_MAP[command][tvType];
+      let tvType = that.tvList[tvName].type;
+      let cmd = COMMAND_MAP[command][tvType];
 
-        switch (tvType) {
-          case "webos":
-            try {
-              let webOsApi = new WebOsApi({
-                url: "ws://" + that.tvList[tvName].host + ":" + that.tvList[tvName].port,
-                clientKey: that.tvList[tvName].pairingKey,
-                saveKey: (key, cb) => cb(null)
+      switch (tvType) {
+        case "webos":
+          try {
+            let webOsApi = new WebOsApi({
+              url: "ws://" + that.tvList[tvName].host + ":" + that.tvList[tvName].port,
+              clientKey: that.tvList[tvName].pairingKey,
+              saveKey: (key, cb) => cb(null)
+            });
+            webOsApi.on("connect", () => {
+              webOsApi.request(cmd, (err, res) => {
+                err ? reject(err) : resolve(res);
+                webOsApi.disconnect();
               });
-              webOsApi.on("connect", () => {
-                webOsApi.request(cmd, (err, res) => {
-                  err ? reject(err) : resolve(res);
-                  webOsApi.disconnect();
-                });
-              });
-              webOsApi.on("error", (err) => reject(err));
-            } catch (e) {
-              reject(e);
-            }
-            break;
-          default:
-            reject(new Error("Wrong tvName was given - " + tvName));
-            break;
-        }
+            });
+            webOsApi.on("error", (err) => reject(err));
+          } catch (e) {
+            reject(e);
+          }
+          break;
+        default:
+          reject(new Error("Wrong tvName was given - " + tvName));
+          break;
       }
+    }
     );
   };
-
 }
 
 module.exports = TvAPI;

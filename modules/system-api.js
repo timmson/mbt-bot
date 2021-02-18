@@ -24,7 +24,7 @@ class SystemApi {
           os: await si.osInfo(),
           load: await si.currentLoad()
         };
-        //data.sensors = await si.cpuTemperature();
+        // data.sensors = await si.cpuTemperature();
 
         data.memory = await si.mem();
         Object.keys(data.memory).forEach(key => {

@@ -6,7 +6,6 @@ const fs = require("fs");
 const TorrentApi = require("./modules/torrent-api");
 const TvApi = require("./modules/tv-api");
 const systemApi = require("./modules/system-api");
-//const Agent = require("socks-proxy-agent");
 const temper = require("node-temper");
 
 const Telegraf = require("telegraf");
@@ -25,11 +24,6 @@ function Bot (config, log) {
   this.tvApi = new TvApi(config.tv);
   this.srvCommApi = new SerCommApi(config.router);
   this.bot = new Telegraf(config.message.token);
-/*  this.bot = new Telegraf(config.message.token, {
-    telegram: {
-      agent: new Agent(config.socks)
-    }
-  });*/
   that = this;
 }
 
