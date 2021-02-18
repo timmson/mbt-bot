@@ -1,5 +1,4 @@
 class LogAPI {
-
   constructor (sender) {
     this.sender = sender;
   }

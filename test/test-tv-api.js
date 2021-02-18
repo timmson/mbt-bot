@@ -4,7 +4,6 @@ const WebOsApi = require("lgtv2");
 jest.mock("lgtv2");
 
 describe("TvAPI should", () => {
-
   const tvList = { "myTv": { "type": "webos" }, "myTvWrong": { "type": "windows" } };
   const tvAPI = new TvAPI(tvList);
 
