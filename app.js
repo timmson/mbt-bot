@@ -61,7 +61,8 @@ app.once("ready", () => {
     show: false,
     icon: path.join(__dirname, config.webDir, "icon.png"),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 
@@ -70,11 +71,7 @@ app.once("ready", () => {
 
   position = window.getPosition();
 
-  window.loadURL(url.format({
-    pathname: path.join(__dirname, config.webDir, "index.html"),
-    protocol: "file:",
-    slashes: true
-  }));
+  const res = window.loadURL(["file://", __dirname, config.webDir, "index.html"].join("/"));
 
   window.once("ready-to-show", () => {
     // window.show();

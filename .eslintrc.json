@@ -5,7 +5,6 @@
     "es6": true,
     "jest": true
   },
-  "extends": "standard",
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -14,10 +13,6 @@
     "ecmaVersion": 2018
   },
   "rules": {
-    /*"indent": [
-      "error",
-      "tab"
-    ],*/
     "linebreak-style": [
       "error",
       "unix"

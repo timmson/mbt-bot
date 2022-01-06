@@ -16,7 +16,7 @@ describe("SystemAPI should", () => {
   });
 
   test("save screenshot", () => {
-    SystemAPI.getScreen("image.png")
+    SystemAPI.getScreen("image.png");
     expect(nircmd).toHaveBeenCalledWith("savescreenshot image.png");
   });
 
