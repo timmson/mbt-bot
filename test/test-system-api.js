@@ -1,7 +1,7 @@
 const SystemAPI = require("../modules/system-api");
-const nircmd = require("nircmd");
+const nircmd = require("../modules/nircmd-api");
 
-jest.mock("nircmd");
+jest.mock("../modules/nircmd-api");
 
 describe("SystemAPI should", () => {
 

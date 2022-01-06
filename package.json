@@ -10,7 +10,6 @@
     "jquery": "^3.6.0",
     "lgtv2": "^1.6.3",
     "moment": "^2.29.1",
-    "nircmd": "2.0.0",
     "node-temper": "^1.0.9",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
@@ -28,7 +27,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager . --ignore .idea --overwrite --out bin",
+    "package": "electron-packager . --ignore=\"(.idea|.github|test)\" --overwrite --out bin",
     "lint": "npx eslint app.js bot.js ./modules ./test ./web --fix",
     "test": "npx jest",
     "coverage": "npx jest --collectCoverage"

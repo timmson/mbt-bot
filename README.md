@@ -1,4 +1,4 @@
-## personal Telegram bot 
+## private Telegram bot
 
 Author: [timmson666@mail.ru](mailto:timmson666@mail.ru)
 

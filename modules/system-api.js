@@ -1,6 +1,6 @@
 const bytes = require("bytes");
 const si = require("systeminformation");
-const nircmd = require("nircmd");
+const nircmd = require("./nircmd-api");
 
 class SystemApi {
   static sendCommand (command) {
@@ -40,16 +40,16 @@ class SystemApi {
         }).filter((row) => row.cpu !== 0).sort((a, b) => a.cpu <= b.cpu).slice(0, 3).reverse();
 
         data.storage = (await si.fsSize()).map(row => {
-          return {
-            size: bytes(parseInt(row.size, 10)),
-            used: bytes(row.used)
-          };
-        }
+            return {
+              size: bytes(row.size, {}),
+              used: bytes(row.used, {})
+            };
+          }
         );
 
         data.network = await si.networkStats();
-        data.network.rx = bytes(data.network[0].rx_bytes);
-        data.network.tx = bytes(data.network[0].tx_bytes);
+        data.network.rx = bytes(data.network[0].rx_bytes, {});
+        data.network.tx = bytes(data.network[0].tx_bytes, {});
         resolve(data);
       } catch (error) {
         reject(error);
