@@ -28,7 +28,7 @@ class SystemApi {
 
         data.memory = await si.mem();
         Object.keys(data.memory).forEach(key => {
-          data.memory[key] = bytes(data.memory[key]);
+          data.memory[key] = bytes(data.memory[key], {});
         });
 
         data.process = (await si.processes()).list;
