@@ -19,7 +19,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install
       run: |
-        npm i mocha nyc codecov  -g
+        npm i codecov  -g
         npm i
     - name: Lint and coverage
       run: |
