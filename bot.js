@@ -12,6 +12,7 @@ const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
 
 const SerCommApi = require("sercomm-rv6699");
+const UserAPI = require("./modules/user-api");
 
 let that = null;
 
@@ -24,6 +25,7 @@ function Bot (config, log) {
   this.tvApi = new TvApi(config.tv);
   this.srvCommApi = new SerCommApi(config.router);
   this.bot = new Telegraf(config.message.token);
+  this.userAPI = new UserAPI(config.userName);
   that = this;
 }
 
@@ -147,11 +149,26 @@ Bot.prototype.startSystem = () => {
     } else {
       try {
         let list = await that.srvCommApi.getDeviceList();
-        ctx.reply(list.reduce((p, i) => p + "\n" + [
+        await ctx.reply(list.reduce((p, i) => p + "\n" + [
           (i.hostname != null && i.hostname !== "--") ? i.hostname : i.ip + " [" + i.mac + "]",
           i.alive === "Y" ? "🌞 " + i.active_time + " Already" : ("🌙 " + i.last_see_time)
         ].join("  -  "), ""));
         that.sendInfo(ctx, "Data sent, size=" + JSON.stringify(list), 2);
+      } catch (err) {
+        that.sendError(ctx, err);
+      }
+    }
+  });
+
+  that.bot.command("disabled", async (ctx) => {
+    that.sendInfo(ctx, "/disabled", 0);
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1);
+    } else {
+      try {
+        const response = await that.userAPI.toggleDisable();
+        await ctx.reply(response);
+        that.sendInfo(ctx, "Reply war sent:" + response, 2);
       } catch (err) {
         that.sendError(ctx, err);
       }

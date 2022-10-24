@@ -1,26 +1,62 @@
-//const LogAPI = require("../modules/log-api");
+require("child_process");
+const UserAPI = require("../modules/user-api");
 
-const execFile = require("child_process").execFile;
+const name = "Jack";
+
+jest.mock("child_process", () => {
+    let status = "True";
+    return {
+      execFile: function (command, parameters, callback) {
+        if (command === "powershell.exe") {
+          expect(parameters).toHaveLength(2);
+          let result = "OK";
+          switch (parameters[0]) {
+            case "Get-LocalUser":
+              result = "\n" +
+                "Name  Enabled Description\n" +
+                "----  ------- -----------\n" +
+                `Jack ${status}`;
+              break;
+            case "Enable-LocalUser":
+              status = "True";
+              break;
+            case "Disable-LocalUser":
+              status = "False";
+              break;
+          }
+          expect(parameters[1]).toEqual(name);
+          callback(null, result);
+        }
+        callback("fail", null);
+      }
+    };
+  }
+);
 
 describe("CmdAPI should", () => {
-  //const logAPI = new LogAPI(new Sender());
+  const userAPI = new UserAPI(name);
 
-  test("call info", () => {
+  test("toggle disable", () =>
+    new Promise(async (resolve, reject) => {
+      try {
+        let isEnabled = await userAPI.isEnabled();
+        expect(isEnabled).toBeTruthy();
 
-    /**
-     * PS C:\WINDOWS\system32> Disable-LocalUser -Name "Alisa"
-     * PS C:\WINDOWS\system32> Enable-LocalUser -Name "Alisa"
-     * PS C:\WINDOWS\system32> Get-LocalUser Alisa
-     */
-    /*    execFile(command, parameters.split(" "), (error, stdout) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(stdout);
-          }
-        });*/
+        await userAPI.toggleDisable();
 
-    expect(true).toBeTruthy();
-  });
+        isEnabled = await userAPI.isEnabled();
+        expect(isEnabled).toBeFalsy();
+
+        await userAPI.toggleDisable();
+
+        isEnabled = await userAPI.isEnabled();
+        expect(isEnabled).toBeTruthy();
+
+        resolve("OK");
+      } catch (e) {
+        reject(e);
+      }
+    })
+  );
 
 });
