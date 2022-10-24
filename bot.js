@@ -168,7 +168,7 @@ Bot.prototype.startSystem = () => {
       try {
         const response = await that.userAPI.toggleDisable();
         await ctx.reply(response);
-        that.sendInfo(ctx, "Reply war sent:" + response, 2);
+        that.sendInfo(ctx, "Reply was sent: " + response, 2);
       } catch (err) {
         that.sendError(ctx, err);
       }
