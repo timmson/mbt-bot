@@ -9,7 +9,7 @@
     "bytes": "^3.1.2",
     "jquery": "^3.6.0",
     "lgtv2": "^1.6.3",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "node-temper": "^1.0.9",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
