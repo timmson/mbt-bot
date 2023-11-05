@@ -1,75 +1,73 @@
-const TorrentAPI = require("../modules/torrent-api");
-const Transmission = require("transmission-promise");
-const request = require("request");
+const TorrentAPI = require("../modules/torrent-api")
+const Transmission = require("transmission-promise")
+const axios = require("axios")
 
-jest.mock("fs");
-jest.mock("transmission-promise");
-jest.mock("request");
+jest.mock("fs")
+jest.mock("transmission-promise")
+jest.mock("axios")
 
 class Stream {
   pipe (fileStream) {
-    expect(fileStream).not.toBeNull();
-    return this;
+    expect(fileStream).not.toBeNull()
+    return this
   }
 }
 
 describe("Torrent API should", () => {
-  const config = { torrent: {} };
-  const torrentAPI = new TorrentAPI(config);
+  const config = { torrent: {} }
+  const torrentAPI = new TorrentAPI(config)
 
-  /*  test("list torrents successfully", () => {
-    let expectedList = [];
-    expect.assertions(1);
-    Transmission.mockImplementation(()=> {
+/*  test("list torrents successfully", () => {
+    let expectedList = []
+    expect.assertions(1)
+    Transmission.mockImplementation(() => {
       return {
-        get: () => { return Promise.resolve({torrents: expectedList}); }
-      };
-    });
+        get: () => Promise.resolve({ torrents: expectedList })
+      }
+    })
 
-    return expect(torrentAPI.list()).resolves.toEqual(expectedList);
-  });
-
- */
+    return expect(torrentAPI.list()).resolves.toEqual(expectedList)
+  })*/
 
   test("add torrent successfully", () => {
-    expect.assertions(3);
+    expect.assertions(3)
 
     Stream.prototype.on = (command, cb) => {
       if (command === "finish") {
-        cb();
+        cb()
       }
-    };
-    request.get.mockReturnValue(new Stream());
+    }
+    axios.get.mockReturnValue({ data: new Stream() })
 
-    expect(Transmission).toHaveBeenCalled();
-    return expect(torrentAPI.add("some url")).resolves.toEqual("OK");
-  });
+    expect(Transmission).toHaveBeenCalled()
+    return expect(torrentAPI.add("some url")).resolves.toEqual("OK")
+  })
 
   test("add torrent with exception", () => {
-    const expectedError = new Error();
-    expect.assertions(3);
+    const expectedError = new Error()
+    expect.assertions(3)
 
     Stream.prototype.on = (command, cb) => {
       if (command === "error") {
-        cb(expectedError);
+        cb(expectedError)
       }
-    };
-    request.get.mockReturnValue(new Stream());
+    }
+    axios.get.mockReturnValue({ data: new Stream() })
 
-    expect(Transmission).toHaveBeenCalled();
-    return expect(torrentAPI.add("some url")).rejects.toEqual(expectedError);
-  });
+    expect(Transmission).toHaveBeenCalled()
+    return expect(torrentAPI.add("some url")).rejects.toEqual(expectedError)
+  })
 
   test("remove torrent successfully", () => {
-    expect.assertions(2);
+    expect.assertions(2)
 
-    expect(Transmission).toHaveBeenCalled();
-    return expect(torrentAPI.remove()).resolves.toEqual("OK");
-  });
+    expect(Transmission).toHaveBeenCalled()
+    return expect(torrentAPI.remove()).resolves.toEqual("OK")
+  })
 
   /*  test("remove torrent exception", () => {
-    const expectedError = new Error();
-    expect.assertions(2);
+    const expectedError = new Error()
+    expect.assertions(2)
 
     Transmission.mockImplementation(() => {
       return {
@@ -77,7 +75,7 @@ describe("Torrent API should", () => {
       }
     })
 
-    expect(Transmission).toHaveBeenCalled();
-    return expect(torrentAPI.remove()).rejects.toEqual(expectedError);
-  }); */
-});
+    expect(Transmission).toHaveBeenCalled()
+    return expect(torrentAPI.remove()).rejects.toEqual(expectedError)
+  }) */
+})

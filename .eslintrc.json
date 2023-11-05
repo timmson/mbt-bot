@@ -23,7 +23,7 @@
     ],
     "semi": [
       "error",
-      "always"
+      "never"
     ],
     "space-before-function-paren": "off",
     "no-unused-expressions": "off"
