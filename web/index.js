@@ -1,6 +1,6 @@
-const $ = require("jquery");
-const { ipcRenderer } = require("electron");
-const moment = require("moment");
+const $ = require("jquery")
+const { ipcRenderer } = require("electron")
+const moment = require("moment")
 
 let log = (data) => {
   let message = [
@@ -13,18 +13,18 @@ let log = (data) => {
     "]</span>  ",
     data.message,
     "<br/>"
-  ];
-  $("div#log").append(message.join(""));
-};
+  ]
+  $("div#log").append(message.join(""))
+}
 
 $(() => {
   ipcRenderer.on("log", (event, arg) => {
-    $("div#log").append(log(arg));
-  });
+    $("div#log").append(log(arg))
+  })
 
   log({
     level: "info",
     date: new Date(),
     message: "Bot has started"
-  });
-});
+  })
+})
