@@ -1,7 +1,6 @@
 const bytes = require("bytes")
 const fs = require("fs")
 const path = require("path")
-const request = require("request")
 const Transmission = require("transmission-promise")
 const axios = require("axios")
 
@@ -45,16 +44,22 @@ class Torrent {
   }
 
   add (url) {
-    return new Promise((resolve, reject) => {
-      let stream = request.get(url).pipe(fs.createWriteStream(that.config.torrent.downloadDir + new Date().getTime() + ".torrent"))
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await axios.get(url, { responseType: "stream" })
+        const stream = response.data.pipe(fs.createWriteStream(that.config.torrent.downloadDir + new Date().getTime() + ".torrent"))
 
-      stream.on("finish", () => {
-        resolve("OK")
-      })
+        stream.on("finish", () => {
+          resolve("OK")
+        })
 
-      stream.on("error", (error) => {
+        stream.on("error", (error) => {
+          reject(error)
+        })
+
+      } catch (error) {
         reject(error)
-      })
+      }
     })
   }
 
