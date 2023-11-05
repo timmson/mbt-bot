@@ -4,9 +4,7 @@ const path = require("path");
 const fs = require("fs");
 
 const TorrentApi = require("./modules/torrent-api");
-const TvApi = require("./modules/tv-api");
 const systemApi = require("./modules/system-api");
-const temper = require("node-temper");
 
 const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
@@ -22,7 +20,6 @@ function Bot (config, log) {
   this.config = config;
   this.log = log;
   this.torrentApi = new TorrentApi(config);
-  this.tvApi = new TvApi(config.tv);
   this.srvCommApi = new SerCommApi(config.router);
   this.bot = new Telegraf(config.message.token);
   this.userAPI = new UserAPI(config.userName);
@@ -95,18 +92,6 @@ Bot.prototype.startSystem = () => {
   }
   );
 
-  that.bot.command("temperature", (ctx) => {
-    that.sendInfo(ctx, "/temperature", 0);
-    if (!that.isAuthorized(ctx)) {
-      that.sendInfo(ctx, "Sorry :(", 1);
-    } else {
-      temper().then(
-        data => ctx.reply(data.out + "°C"),
-        err => that.sendError(ctx, err)
-      );
-    }
-  });
-
   that.bot.command("pc", (ctx) => {
     that.sendInfo(ctx, "/pc", 0);
     if (!that.isAuthorized(ctx)) {
@@ -174,33 +159,6 @@ Bot.prototype.startSystem = () => {
       }
     }
   });
-};
-
-Bot.prototype.startTV = () => {
-  that.bot.command("tv", (ctx) => {
-    that.sendInfo(ctx, "/tv", 0);
-    if (!that.isAuthorized(ctx)) {
-      that.sendInfo(ctx, "Sorry :(", 1);
-    } else {
-      ctx.reply("-----==== Press any button ====-----",
-        Markup.inlineKeyboard([
-          [
-            Markup.callbackButton("🔉", "tv-lg28-volume-down"),
-            Markup.callbackButton("🔇", "tv-lg28-mute"),
-            Markup.callbackButton("🔊", "tv-lg28-volume-up")
-          ],
-          [
-            Markup.callbackButton("⬅", "tv-lg28-channel-down"),
-            Markup.callbackButton("🔴", "tv-lg28-power-off"),
-            Markup.callbackButton("➡", "tv-lg28-channel-up")
-          ]
-        ]
-        ).extra()
-      );
-      that.sendInfo(ctx, "Data sent", 2);
-    }
-  }
-  );
 };
 
 Bot.prototype.startTorrent = () => {
@@ -299,15 +257,6 @@ Bot.prototype.startTorrent = () => {
               break;
           }
           break;
-        case "tv":
-          try {
-            await that.tvApi.command(data[1], data.slice(2).join("-"));
-            await ctx.answerCbQuery("🆗");
-          } catch (err) {
-            await ctx.answerCbQuery("⚠");
-            that.sendError(ctx, err);
-          }
-          break;
         default:
           await ctx.answerCbQuery("⚠");
           break;
@@ -342,7 +291,6 @@ Bot.prototype.startTorrent = () => {
 Bot.prototype.start = () => {
   that.startBasic();
   that.startSystem();
-  that.startTV();
   that.startTorrent();
 
   that.bot.startPolling();

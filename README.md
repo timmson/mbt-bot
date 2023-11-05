@@ -9,19 +9,9 @@
 about - About
 net - List network devices
 pc - Get PC remote
-screen - Take the screenshot
 start - Start
 stop - Stop
 system - Get system information
-temperature - Get temperature
 torrent - List torrents
-tv - Get TV remote
-```
-
-## Add as Windows service
-
-Run as Administrator
-```cmd
-.\nssm\nssm.exe install MbtBot
 ```
 
