@@ -10,7 +10,7 @@
     "jquery": "^3.7.1",
     "moment": "^2.29.4",
     "sercomm-rv6699": "^1.0.1",
-    "systeminformation": "^5.21.7",
+    "systeminformation": "^5.23.8",
     "telegraf": "^3.39.0",
     "transmission-promise": "^1.1.6"
   },
