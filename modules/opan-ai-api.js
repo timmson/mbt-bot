@@ -2,7 +2,6 @@ const OpenAI = require("openai")
 
 const OpenAIAPI = (config) => {
 
-  const model = config.model
   const openAI = new OpenAI({
     baseURL: config.baseURL,
     apiKey: ""
@@ -12,7 +11,6 @@ const OpenAIAPI = (config) => {
     reply: async (message) => {
       const stream = await openAI.chat.completions.create(
         {
-          model: model,
           stream: false,
           messages: [
             {
@@ -29,4 +27,4 @@ const OpenAIAPI = (config) => {
 
 }
 
-module.exports  = OpenAIAPI
+module.exports = OpenAIAPI

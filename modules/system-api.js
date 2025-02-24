@@ -48,15 +48,15 @@ class SystemApi {
         )
 
         data.network = await si.networkStats()
-        data.network.rx = bytes(data.network[0].rx_bytes, {})
-        data.network.tx = bytes(data.network[0].tx_bytes, {})
+        data.network.rx = data.network.length > 0 ? bytes(data.network[0].rx_bytes, {}) : 0
+        data.network.tx = data.network.length > 0 ? bytes(data.network[0].tx_bytes, {}) : 0
         resolve(data)
       } catch (error) {
         reject(error)
       }
     }
     )
-    
+
   }
 }
 
