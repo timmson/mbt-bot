@@ -1,6 +1,5 @@
 const config = require("./config")
 const path = require("path")
-const url = require("url")
 const Bot = require("./bot")
 
 const { app, BrowserWindow, Tray } = require("electron")

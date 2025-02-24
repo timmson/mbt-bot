@@ -3,13 +3,13 @@ const packageInfo = require("./package.json")
 const path = require("path")
 const fs = require("fs")
 
-const TorrentApi = require("./modules/torrent-api")
-const systemApi = require("./modules/system-api")
+const NetAPI = require("./modules/net-api")
+const SystemAPI = require("./modules/system-api")
+const TorrentAPI = require("./modules/torrent-api")
+const OpenAIAPI = require("./modules/opan-ai-api")
 
-const Telegraf = require("telegraf")
 const Markup = require("telegraf/markup")
-
-const SerCommApi = require("sercomm-rv6699")
+const Telegraf = require("telegraf")
 
 let that = null
 
@@ -18,9 +18,10 @@ let fileRegistry = {}
 function Bot (config, log) {
   this.config = config
   this.log = log
-  this.torrentApi = new TorrentApi(config)
-  this.srvCommApi = new SerCommApi(config.router)
   this.bot = new Telegraf(config.message.token)
+  this.torrentAPI = new TorrentAPI(config)
+  this.openAIAPI = OpenAIAPI(config.openAI)
+  this.netAPI = NetAPI(config.router)
   that = this
 }
 
@@ -61,68 +62,56 @@ Bot.prototype.startBasic = () => {
 }
 
 Bot.prototype.startSystem = () => {
-  /**
-   * System
-   * TODO Add Net
-   */
-  that.bot.command("system", (ctx) => {
-    that.sendInfo(ctx, "/system", 0)
-    if (!that.isAuthorized(ctx)) {
-      that.sendInfo(ctx, "Sorry :(", 1)
-    } else {
-      systemApi.getInfo().then(
-        data => {
-          let info = [
-            "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
-              last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
-            /* "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃", */
-            "📊 " + data.memory.active + " of " + data.memory.total,
-            "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
-            "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
-            "🔮 " + data.network.rx + "/" + data.network.tx
-          ]
-          ctx.replyWithHTML(info.join("\n")).catch((err) => that.sendError(ctx, err))
+  that.bot.command("system", async (ctx) => {
+      that.sendInfo(ctx, "/system", 0)
+      if (!that.isAuthorized(ctx)) {
+        that.sendInfo(ctx, "Sorry :(", 1)
+      } else {
+        try {
+          await ctx.replyWithChatAction("typing")
+          const message = await that.netAPI.getDevices()
+          ctx.replyWithHTML(message).catch((err) => that.sendError(ctx, err))
           that.sendInfo(ctx, "Data sent", 2)
-        },
-        (err) => that.sendError(ctx, err)
-      )
+        } catch (err) {
+          that.sendError(ctx, err)
+        }
+      }
     }
-  }
   )
 
   that.bot.command("pc", (ctx) => {
-    that.sendInfo(ctx, "/pc", 0)
-    if (!that.isAuthorized(ctx)) {
-      that.sendInfo(ctx, "Sorry :(", 1)
-    } else {
-      ctx.reply("-----==== Press any button ====-----",
-        Markup.inlineKeyboard([
-          [
-            Markup.callbackButton("🔉", "pc-key-0xAE"),
-            Markup.callbackButton("🔇", "pc-key-0xAD"),
-            Markup.callbackButton("🔊", "pc-key-0xAF")
-          ],
-          [
-            Markup.callbackButton("⏪", "pc-key-0xB1"),
-            Markup.callbackButton("⏯", "pc-key-0xB3"),
-            Markup.callbackButton("⏩", "pc-key-0xB0")
-          ],
-          [
-            Markup.callbackButton("📸", "pc-screen"),
-            Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
-            Markup.callbackButton("YT 🖥", "pc-key-0x46")
-          ],
-          [
-            Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
-            Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
-            Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
-          ]
-        ]
-        ).extra()
-      )
-      that.sendInfo(ctx, "Data sent", 2)
+      that.sendInfo(ctx, "/pc", 0)
+      if (!that.isAuthorized(ctx)) {
+        that.sendInfo(ctx, "Sorry :(", 1)
+      } else {
+        ctx.reply("-----==== Press any button ====-----",
+          Markup.inlineKeyboard([
+              [
+                Markup.callbackButton("🔉", "pc-key-0xAE"),
+                Markup.callbackButton("🔇", "pc-key-0xAD"),
+                Markup.callbackButton("🔊", "pc-key-0xAF")
+              ],
+              [
+                Markup.callbackButton("⏪", "pc-key-0xB1"),
+                Markup.callbackButton("⏯", "pc-key-0xB3"),
+                Markup.callbackButton("⏩", "pc-key-0xB0")
+              ],
+              [
+                Markup.callbackButton("📸", "pc-screen"),
+                Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
+                Markup.callbackButton("YT 🖥", "pc-key-0x46")
+              ],
+              [
+                Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
+                Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
+                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
+              ]
+            ]
+          ).extra()
+        )
+        that.sendInfo(ctx, "Data sent", 2)
+      }
     }
-  }
   )
 
   that.bot.command("net", async (ctx) => {
@@ -131,12 +120,10 @@ Bot.prototype.startSystem = () => {
       that.sendInfo(ctx, "Sorry :(", 1)
     } else {
       try {
-        let list = await that.srvCommApi.getDeviceList()
-        await ctx.reply(list.reduce((p, i) => p + "\n" + [
-          (i.hostname != null && i.hostname !== "--") ? i.hostname : i.ip + " [" + i.mac + "]",
-          i.alive === "Y" ? "🌞 " + i.active_time + " Already" : ("🌙 " + i.last_see_time)
-        ].join("  -  "), ""))
-        that.sendInfo(ctx, "Data sent, size=" + JSON.stringify(list), 2)
+        await ctx.replyWithChatAction("typing")
+        const message = await that.netAPI.getDevices()
+        await ctx.reply(message)
+        that.sendInfo(ctx, "Data sent", 2)
       } catch (err) {
         that.sendError(ctx, err)
       }
@@ -147,116 +134,30 @@ Bot.prototype.startSystem = () => {
 
 Bot.prototype.startTorrent = () => {
   that.bot.command("torrent", (ctx) => {
-    that.sendInfo(ctx, "/torrent", 0)
-    if (!that.isAuthorized(ctx)) {
-      that.sendInfo(ctx, "Sorry :(", 1)
-    } else {
-      that.torrentApi.list().then(
-        (torrents) =>
-          torrents.forEach(torrent =>
-            ctx.reply(
-              torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
-              Markup.inlineKeyboard(
-                [
-                  Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
-                  Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
-                ]
-              ).extra()
-            )
-          ),
-        (err) => that.sendError(ctx, err)
-      )
-      that.sendInfo(ctx, "Data sent", 2)
-    }
-  }
-  )
-
-  that.bot.on("callback_query", async (ctx) => {
-    try {
-      that.sendInfo(ctx, ctx.callbackQuery.data, 0)
-      let data = ctx.callbackQuery.data.split("-")
-      switch (data[0]) {
-        case "torrent":
-          if (data[1] === "remove") {
-            await that.torrentApi.remove(data[2])
-            await ctx.editMessageText("[removed]")
-          } else if (data[1] === "list") {
-            let torrents = await that.torrentApi.list(data[2])
-            torrents[0].files.forEach((file) => {
-              let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000)
-              fileRegistry[fileId] = file.name
+      that.sendInfo(ctx, "/torrent", 0)
+      if (!that.isAuthorized(ctx)) {
+        that.sendInfo(ctx, "Sorry :(", 1)
+      } else {
+        that.torrentAPI.list().then(
+          (torrents) =>
+            torrents.forEach(torrent =>
               ctx.reply(
-                path.basename(file.name) + "\n" + file.sizeWhenDone,
-                Markup.inlineKeyboard([Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)]).extra()
-              ).catch(err => console.error(err))
-            }
-            )
-            await ctx.answerCbQuery("🆗")
-          } else if (data[1] === "download") {
-            let fileName = fileRegistry[data[2]]
-            console.log(fileName)
-            await ctx.answerCbQuery("Wait. File is sending...")
-            await ctx.replyWithDocument({
-              source: fs.createReadStream(fileName),
-              filename: path.basename(fileName)
-            })
-          } else {
-            await ctx.answerCbQuery("⚠")
-          }
-          break
-        case "pc":
-          switch (data[1]) {
-            case "key":
-              await systemApi.sendKey(data[2])
-              await ctx.answerCbQuery("🆗")
-              break
-            case "shortcut":
-              for (let i = 2; i < data.length; i++) {
-                await systemApi.sendCommand(["sendkey", data[i], "down"])
-              }
-              for (let i = 2; i < data.length; i++) {
-                await systemApi.sendCommand(["sendkey", data[i], "up"])
-              }
-              await ctx.answerCbQuery("🆗")
-              break
-            case "command":
-              await systemApi.sendCommand(data[2])
-              await ctx.answerCbQuery("🆗")
-              break
-            case "screen" :
-              let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg")
-              try {
-                await systemApi.getScreen(imageName)
-                await ctx.replyWithPhoto({ source: fs.createReadStream(imageName) })
-                fs.unlinkSync(imageName)
-                that.sendInfo(ctx, "Data sent", 2)
-                await ctx.answerCbQuery("🆗")
-              } catch (err) {
-                await ctx.answerCbQuery("⚠")
-                that.sendError(ctx, err)
-              }
-              break
-            default:
-              await ctx.answerCbQuery("⚠")
-              break
-          }
-          break
-        default:
-          await ctx.answerCbQuery("⚠")
-          break
+                torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
+                Markup.inlineKeyboard(
+                  [
+                    Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
+                    Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
+                  ]
+                ).extra()
+              )
+            ),
+          (err) => that.sendError(ctx, err)
+        )
+        that.sendInfo(ctx, "Data sent", 2)
       }
-      that.sendInfo(ctx, "Data sent", 2)
-    } catch (err) {
-      console.error(err)
-      ctx.answerCbQuery("⛔️" + err.toString()).catch((err) => that.sendError(ctx, err))
     }
-  }
   )
 
-  /**
-   * TODO
-   * Migrate to native Telegraph Api
-   */
   that.bot.on("document", async (ctx) => {
     that.sendInfo(ctx, "File received", 0)
     if (!that.isAuthorized(ctx)) {
@@ -270,12 +171,114 @@ Bot.prototype.startTorrent = () => {
       }
     }
   })
+
+  that.bot.on("callback_query", async (ctx) => {
+      try {
+        that.sendInfo(ctx, ctx.callbackQuery.data, 0)
+        let data = ctx.callbackQuery.data.split("-")
+        switch (data[0]) {
+          case "torrent":
+            if (data[1] === "remove") {
+              await that.torrentApi.remove(data[2])
+              await ctx.editMessageText("[removed]")
+            } else if (data[1] === "list") {
+              let torrents = await that.torrentApi.list(data[2])
+              torrents[0].files.forEach((file) => {
+                  let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000)
+                  fileRegistry[fileId] = file.name
+                  ctx.reply(
+                    path.basename(file.name) + "\n" + file.sizeWhenDone,
+                    Markup.inlineKeyboard([Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)]).extra()
+                  ).catch(err => console.error(err))
+                }
+              )
+              await ctx.answerCbQuery("🆗")
+            } else if (data[1] === "download") {
+              let fileName = fileRegistry[data[2]]
+              console.log(fileName)
+              await ctx.answerCbQuery("Wait. File is sending...")
+              await ctx.replyWithDocument({
+                source: fs.createReadStream(fileName),
+                filename: path.basename(fileName)
+              })
+            } else {
+              await ctx.answerCbQuery("⚠")
+            }
+            break
+          case "pc":
+            switch (data[1]) {
+              case "key":
+                await SystemAPI.sendKey(data[2])
+                await ctx.answerCbQuery("🆗")
+                break
+              case "shortcut":
+                for (let i = 2; i < data.length; i++) {
+                  await SystemAPI.sendCommand(["sendkey", data[i], "down"])
+                }
+                for (let i = 2; i < data.length; i++) {
+                  await SystemAPI.sendCommand(["sendkey", data[i], "up"])
+                }
+                await ctx.answerCbQuery("🆗")
+                break
+              case "command":
+                await SystemAPI.sendCommand(data[2])
+                await ctx.answerCbQuery("🆗")
+                break
+              case "screen" :
+                let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg")
+                try {
+                  await SystemAPI.getScreen(imageName)
+                  await ctx.replyWithPhoto({ source: fs.createReadStream(imageName) })
+                  fs.unlinkSync(imageName)
+                  that.sendInfo(ctx, "Data sent", 2)
+                  await ctx.answerCbQuery("🆗")
+                } catch (err) {
+                  await ctx.answerCbQuery("⚠")
+                  that.sendError(ctx, err)
+                }
+                break
+              default:
+                await ctx.answerCbQuery("⚠")
+                break
+            }
+            break
+          default:
+            await ctx.answerCbQuery("⚠")
+            break
+        }
+        that.sendInfo(ctx, "Data sent", 2)
+      } catch (err) {
+        console.error(err)
+        ctx.answerCbQuery("⛔️" + err.toString()).catch((err) => that.sendError(ctx, err))
+      }
+    }
+  )
+
+}
+
+Bot.prototype.startOpenAI = () => {
+  that.bot.on("message", async (ctx) => {
+    that.sendInfo(ctx, "Message received", 0)
+    if (!that.isAuthorized(ctx)) {
+      that.sendInfo(ctx, "Sorry :(", 1)
+    } else {
+      try {
+        await ctx.replyWithChatAction("typing")
+        const response = await that.openAIAPI.reply(ctx.message.text)
+        await ctx.replyWithMarkdown(response)
+        that.sendInfo(ctx, response, 2)
+      } catch (err) {
+        that.sendError(ctx, err)
+      }
+    }
+  })
 }
 
 Bot.prototype.start = () => {
   that.startBasic()
   that.startSystem()
   that.startTorrent()
+  that.startOpenAI()
 
   that.bot.startPolling()
 }
