@@ -10,7 +10,7 @@ const NetAPI = (config) => {
         it.ip,
         (it.hostname != null && it.hostname !== "--") ? it.hostname : it.mac,
         it.alive === "Y" ? `🌞 ${it.active_time} already` : `🌙 ${it.last_see_time}`
-      ].join("  -  ")).join("\n")
+      ].join("  -  "))
     }
   }
 }

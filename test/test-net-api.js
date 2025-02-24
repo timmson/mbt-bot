@@ -1,7 +1,9 @@
 const NetAPI = require("../modules/net-api")
 
-const expected = "xx.xxx.xx.xx  -  yy.yyy.yy.yy  -  🌞 21day:3h:36m:10s already\n" +
+const expected = [
+  "xx.xxx.xx.xx  -  yy.yyy.yy.yy  -  🌞 21day:3h:36m:10s already",
   "yy.yyy.yy.yy  -  xx.xxx.xx.xx  -  🌙 8h:19m:8s Ago"
+]
 const arrange = [{
   ip: "xx.xxx.xx.xx",
   mac: "yy.yyy.yy.yy",

@@ -4,9 +4,9 @@ const path = require("path")
 const fs = require("fs")
 
 const NetAPI = require("./modules/net-api")
-const SystemAPI = require("./modules/system-api")
 const TorrentAPI = require("./modules/torrent-api")
 const OpenAIAPI = require("./modules/opan-ai-api")
+const systemAPI = require("./modules/system-api")
 
 const Markup = require("telegraf/markup")
 const Telegraf = require("telegraf")
@@ -69,8 +69,17 @@ Bot.prototype.startSystem = () => {
       } else {
         try {
           await ctx.replyWithChatAction("typing")
-          const message = await that.netAPI.getDevices()
-          ctx.replyWithHTML(message).catch((err) => that.sendError(ctx, err))
+          const data = await systemAPI.getInfo()
+          const info = [
+            "📈 " + (data.load.avgload * 100) + "% (" + data.process.reduce((last, row) =>
+              last + " " + row.command.split(" ")[0].split("/").slice(-1)[0], "").trim() + ")",
+            /* "🌡 " + data.sensors.main + " ℃/ " + data.sensors.outer + " ℃", */
+            "📊 " + data.memory.active + " of " + data.memory.total,
+            "💾 C: " + data.storage[0].used + " of " + data.storage[0].size,
+            "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
+            "🔮 " + data.network.rx + "/" + data.network.tx
+          ]
+          await ctx.replyWithHTML(info.join("\n"))
           that.sendInfo(ctx, "Data sent", 2)
         } catch (err) {
           that.sendError(ctx, err)
@@ -121,8 +130,8 @@ Bot.prototype.startSystem = () => {
     } else {
       try {
         await ctx.replyWithChatAction("typing")
-        const message = await that.netAPI.getDevices()
-        await ctx.reply(message)
+        const info = await that.netAPI.getDevices()
+        await ctx.replyWithHTML(info.join("\n"))
         that.sendInfo(ctx, "Data sent", 2)
       } catch (err) {
         that.sendError(ctx, err)
@@ -208,26 +217,26 @@ Bot.prototype.startTorrent = () => {
           case "pc":
             switch (data[1]) {
               case "key":
-                await SystemAPI.sendKey(data[2])
+                await systemAPI.sendKey(data[2])
                 await ctx.answerCbQuery("🆗")
                 break
               case "shortcut":
                 for (let i = 2; i < data.length; i++) {
-                  await SystemAPI.sendCommand(["sendkey", data[i], "down"])
+                  await systemAPI.sendCommand(["sendkey", data[i], "down"])
                 }
                 for (let i = 2; i < data.length; i++) {
-                  await SystemAPI.sendCommand(["sendkey", data[i], "up"])
+                  await systemAPI.sendCommand(["sendkey", data[i], "up"])
                 }
                 await ctx.answerCbQuery("🆗")
                 break
               case "command":
-                await SystemAPI.sendCommand(data[2])
+                await systemAPI.sendCommand(data[2])
                 await ctx.answerCbQuery("🆗")
                 break
               case "screen" :
                 let imageName = path.join(__dirname, that.config.temporaryPath, "/shot" + new Date().getTime() + ".jpg")
                 try {
-                  await SystemAPI.getScreen(imageName)
+                  await systemAPI.getScreen(imageName)
                   await ctx.replyWithPhoto({ source: fs.createReadStream(imageName) })
                   fs.unlinkSync(imageName)
                   that.sendInfo(ctx, "Data sent", 2)
