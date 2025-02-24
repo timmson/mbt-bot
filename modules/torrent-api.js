@@ -1,12 +1,12 @@
-const bytes = require("bytes")
+const axios = require("axios")
 const fs = require("fs")
 const path = require("path")
 const Transmission = require("transmission-promise")
-const axios = require("axios")
+const bytes = require("bytes")
 
 let that = null
 
-class Torrent {
+class TorrentAPI {
   constructor (config) {
     this.config = config
     this.transmission = new Transmission({
@@ -75,4 +75,4 @@ class Torrent {
   }
 }
 
-module.exports = Torrent
+module.exports = TorrentAPI
