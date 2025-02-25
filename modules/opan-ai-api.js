@@ -10,24 +10,11 @@ const OpenAIAPI = (config) => {
   })
 
   return {
-    reply: async (message) => {
-
-      const messages = []
-      if (message.indexOf("http") >= 0) {
-        const response = await axios.get(message)
-        const data = convert(response.data, { wordwrap: false })
-        messages.push(
-          { role: "user", content: data },
-          { role: "user", content: "Резюмируй, пожалуйста" }
-        )
-      } else {
-        messages.push({ role: "user", content: message })
-      }
-
+    reply: async (...prompts) => {
+      const messages = prompts.map((it) => ({ role: "user", content: it }))
       const reply = await openAI.chat.completions.create(
         { stream: false, messages: messages }
       )
-
       return reply.choices[0].message.content
     }
   }

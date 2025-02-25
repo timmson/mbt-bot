@@ -6,6 +6,7 @@ const fs = require("fs")
 const NetAPI = require("./modules/net-api")
 const TorrentAPI = require("./modules/torrent-api")
 const OpenAIAPI = require("./modules/opan-ai-api")
+const CrawlerAPI = require("./modules/crawler-api")
 const systemAPI = require("./modules/system-api")
 
 const Markup = require("telegraf/markup")
@@ -273,15 +274,17 @@ Bot.prototype.startOpenAI = () => {
     } else {
       try {
         await ctx.replyWithChatAction("typing")
-        const reply = await that.openAIAPI.reply(ctx.message.text)
-
-        let left = reply
-        while (left.length > 4096) {
-          await ctx.replyWithMarkdown(reply.substring(4096))
-          left = reply.substring(4096)
+        const index = ctx.message.text.indexOf("http")
+        const prompts = []
+        if (index >= 0) {
+          const response = await CrawlerAPI(ctx.message.text.substring(index))
+          prompts.push(response.substring(0, Math.min(4000, response.length)))
+          prompts.push((index === 0) ? "Резюмируй, пожалуйста" : ctx.message.text.substring(0, index))
+        } else {
+          prompts.push(ctx.message.text)
         }
-        await ctx.replyWithMarkdown(left)
-
+        const reply = await that.openAIAPI.reply(prompts)
+        await ctx.replyWithMarkdown(reply)
         that.sendInfo(ctx, "Data sent: " + reply.length, 2)
       } catch (err) {
         that.sendError(ctx, err)
