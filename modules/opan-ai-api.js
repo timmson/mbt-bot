@@ -1,4 +1,6 @@
+const axios = require("axios")
 const OpenAI = require("openai")
+const { convert } = require("html-to-text")
 
 const OpenAIAPI = (config) => {
 
@@ -9,22 +11,26 @@ const OpenAIAPI = (config) => {
 
   return {
     reply: async (message) => {
-      const stream = await openAI.chat.completions.create(
-        {
-          stream: false,
-          messages: [
-            {
-              role: "user",
-              content: message
-            }
-          ]
-        }
+
+      const messages = []
+      if (message.indexOf("http") >= 0) {
+        const response = await axios.get(message)
+        const data = convert(response.data, { wordwrap: false })
+        messages.push(
+          { role: "user", content: data },
+          { role: "user", content: "Резюмируй, пожалуйста" }
+        )
+      } else {
+        messages.push({ role: "user", content: message })
+      }
+
+      const reply = await openAI.chat.completions.create(
+        { stream: false, messages: messages }
       )
 
-      return stream.choices[0].message.content
+      return reply.choices[0].message.content
     }
   }
-
 }
 
 module.exports = OpenAIAPI

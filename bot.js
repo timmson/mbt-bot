@@ -273,9 +273,16 @@ Bot.prototype.startOpenAI = () => {
     } else {
       try {
         await ctx.replyWithChatAction("typing")
-        const response = await that.openAIAPI.reply(ctx.message.text)
-        await ctx.replyWithMarkdown(response)
-        that.sendInfo(ctx, response, 2)
+        const reply = await that.openAIAPI.reply(ctx.message.text)
+
+        let left = reply
+        while (left.length > 4096) {
+          await ctx.replyWithMarkdown(reply.substring(4096))
+          left = reply.substring(4096)
+        }
+        await ctx.replyWithMarkdown(left)
+
+        that.sendInfo(ctx, "Data sent: " + reply.length, 2)
       } catch (err) {
         that.sendError(ctx, err)
       }
