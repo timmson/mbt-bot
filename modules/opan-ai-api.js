@@ -10,7 +10,7 @@ const OpenAIAPI = (config) => {
   })
 
   return {
-    reply: async (...prompts) => {
+    reply: async (prompts) => {
       const messages = prompts.map((it) => ({ role: "user", content: it }))
       const reply = await openAI.chat.completions.create(
         { stream: false, messages: messages }

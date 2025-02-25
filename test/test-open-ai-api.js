@@ -2,14 +2,14 @@ const OpenAI = require("openai")
 const OpenAIAPI = require("../modules/opan-ai-api")
 
 const expected = "Hello! I'm just a computer program"
-const arrange = "Hi! How are you?"
+const arrange = ["Hi! How are you?"]
 
 jest.mock("openai", () =>
   jest.fn().mockImplementation(() => ({
     chat: {
       completions: {
         create: (body) => {
-          expect(body.messages[0].content).toEqual(arrange)
+          expect(body.messages[0].content).toEqual(arrange[0])
           return ({
             choices: [
               {
