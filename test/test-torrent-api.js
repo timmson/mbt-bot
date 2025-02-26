@@ -1,10 +1,20 @@
-const TorrentAPI = require("../modules/torrent-api")
-const Transmission = require("transmission-promise")
 const axios = require("axios")
+const Transmission = require("transmission-promise")
+const bytes = require("bytes")
+const TorrentAPI = require("../modules/torrent-api")
 
 jest.mock("fs")
-jest.mock("transmission-promise")
+jest.mock("bytes")
 jest.mock("axios")
+
+jest.mock("transmission-promise", () => {
+  return jest.fn().mockImplementation(() => ({
+    get: () => ({ torrents: [{ id: 1, files: [{ name: "" }] }] }),
+    remove: () => {
+
+    }
+  }))
+})
 
 class Stream {
   pipe (fileStream) {
@@ -14,20 +24,25 @@ class Stream {
 }
 
 describe("Torrent API should", () => {
-  const config = { torrent: {} }
+  const config = { torrent: { doneDir: "" } }
   const torrentAPI = new TorrentAPI(config)
 
-/*  test("list torrents successfully", () => {
-    let expectedList = []
-    expect.assertions(1)
-    Transmission.mockImplementation(() => {
-      return {
-        get: () => Promise.resolve({ torrents: expectedList })
-      }
-    })
+  test("list all torrents successfully", async () => {
+    const expectedList = [{ id: 1, name: "test-torrent" }]
 
-    return expect(torrentAPI.list()).resolves.toEqual(expectedList)
-  })*/
+    const result = await torrentAPI.list()
+
+    expect(result).toEqual([
+      {
+        id: 1,
+        name: undefined,
+        percentDone: "NaN%",
+        sizeWhenDone: undefined,
+        status: undefined,
+        files: [{ name: ".", "sizeWhenDone": undefined }]
+      }
+    ])
+  })
 
   test("add torrent successfully", () => {
     expect.assertions(3)
