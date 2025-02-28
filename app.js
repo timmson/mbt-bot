@@ -91,11 +91,13 @@ app.once("ready", () => {
 })
 
 process.on("SIGINT", () => {
+  bot && bot.stop("SIGINT")
   console.log("Bot has stopped")
   process.exit(0)
 })
 
 process.on("SIGTERM", () => {
+  bot && bot.stop("SIGTERM")
   console.log("Bot has stopped")
   process.exit(0)
 })
