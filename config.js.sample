@@ -15,8 +15,10 @@ module.exports = {
       port: <transmission port>,
       downloadDir: "<your download dir>"
     },
+    openAI: {
+        baseURL: "http://<your-openai-ip>"
+    },
     userName: "Jack",
-    socks: "socks://<tor ip>:<tor host>",
     webDir: "web",
     temporaryPath: "tmp",
 };

@@ -10,7 +10,7 @@ const CrawlerAPI = require("./modules/crawler-api")
 const systemAPI = require("./modules/system-api")
 
 const Markup = require("telegraf/markup")
-const Telegraf = require("telegraf")
+const { Telegraf } = require("telegraf")
 
 let that = null
 
@@ -23,18 +23,19 @@ function Bot (config, log) {
   this.torrentAPI = new TorrentAPI(config)
   this.openAIAPI = OpenAIAPI(config.openAI)
   this.netAPI = NetAPI(config.router)
+  this.globalKeyboard = Markup.keyboard([["/system", "/net", "/pc", "/torrent"]]).resize()
   that = this
 }
 
 Bot.prototype.sendError = (ctx, err) => {
   that.log.error(err)
-  ctx.reply(err.toString())
+  ctx.reply(err.toString(), that.globalKeyboard)
 }
 
 Bot.prototype.sendInfo = (ctx, message, outbound) => {
   that.log.info(ctx.from.username + " " + ((outbound > 0) ? "<=" : "=>") + " " + message)
   if (outbound === 1) {
-    ctx.reply(message)
+    ctx.reply(message, that.globalKeyboard)
   }
 }
 
@@ -80,7 +81,7 @@ Bot.prototype.startSystem = () => {
             "💾 D: " + data.storage[1].used + " of " + data.storage[1].size,
             "🔮 " + data.network.rx + "/" + data.network.tx
           ]
-          await ctx.replyWithHTML(info.join("\n"))
+          await ctx.replyWithHTML(info.join("\n"), that.globalKeyboard)
           that.sendInfo(ctx, "Data sent", 2)
         } catch (err) {
           that.sendError(ctx, err)
@@ -97,27 +98,27 @@ Bot.prototype.startSystem = () => {
         ctx.reply("-----==== Press any button ====-----",
           Markup.inlineKeyboard([
               [
-                Markup.callbackButton("🔉", "pc-key-0xAE"),
-                Markup.callbackButton("🔇", "pc-key-0xAD"),
-                Markup.callbackButton("🔊", "pc-key-0xAF")
+                Markup.button.callback("🔉", "pc-key-0xAE"),
+                Markup.button.callback("🔇", "pc-key-0xAD"),
+                Markup.button.callback("🔊", "pc-key-0xAF")
               ],
               [
-                Markup.callbackButton("⏪", "pc-key-0xB1"),
-                Markup.callbackButton("⏯", "pc-key-0xB3"),
-                Markup.callbackButton("⏩", "pc-key-0xB0")
+                Markup.button.callback("⏪" , "pc-key-0xB1"),
+                Markup.button.callback("⏯", "pc-key-0xB3"),
+                Markup.button.callback("⏩", "pc-key-0xB0")
               ],
               [
-                Markup.callbackButton("📸", "pc-screen"),
-                Markup.callbackButton("YT ⏯", "pc-key-0x4B"),
-                Markup.callbackButton("YT 🖥", "pc-key-0x46")
+                Markup.button.callback("📸", "pc-screen"),
+                Markup.button.callback("VK ⏯", "pc-key-0x20"),
+                Markup.button.callback("VK 🖥", "pc-key-0x46")
               ],
               [
-                Markup.callbackButton("⬅", "pc-shortcut-0x5B-0x11-0x25"),
-                Markup.callbackButton("🔒 Заблокировать", "pc-command-lockws"),
-                Markup.callbackButton("➡", "pc-shortcut-0x5B-0x11-0x27")
+                Markup.button.callback("⬅", "pc-shortcut-0x5B-0x11-0x25"),
+                Markup.button.callback("🔒 Заблокировать", "pc-command-lockws"),
+                Markup.button.callback("➡", "pc-shortcut-0x5B-0x11-0x27")
               ]
             ]
-          ).extra()
+          )
         )
         that.sendInfo(ctx, "Data sent", 2)
       }
@@ -132,7 +133,7 @@ Bot.prototype.startSystem = () => {
       try {
         await ctx.replyWithChatAction("typing")
         const info = await that.netAPI.getDevices()
-        await ctx.replyWithHTML(info.join("\n"))
+        await ctx.replyWithHTML(info.join("\n"), that.globalKeyboard)
         that.sendInfo(ctx, "Data sent", 2)
       } catch (err) {
         that.sendError(ctx, err)
@@ -155,10 +156,10 @@ Bot.prototype.startTorrent = () => {
                 torrent.name + "\n" + (torrent.status === "done" ? torrent.sizeWhenDone : torrent.percentDone),
                 Markup.inlineKeyboard(
                   [
-                    Markup.callbackButton("🚾 Remove", "torrent-remove-" + torrent.id),
-                    Markup.callbackButton("📂 Files", "torrent-list-" + torrent.id)
+                    Markup.button.callback("🚾 Remove", "torrent-remove-" + torrent.id),
+                    Markup.button.callback("📂 Files", "torrent-list-" + torrent.id)
                   ]
-                ).extra()
+                )
               )
             ),
           (err) => that.sendError(ctx, err)
@@ -198,7 +199,7 @@ Bot.prototype.startTorrent = () => {
                   fileRegistry[fileId] = file.name
                   ctx.reply(
                     path.basename(file.name) + "\n" + file.sizeWhenDone,
-                    Markup.inlineKeyboard([Markup.callbackButton("⬇ Download", "torrent-download-" + fileId)]).extra()
+                    Markup.inlineKeyboard([Markup.button.callback("⬇ Download", "torrent-download-" + fileId)])
                   ).catch(err => console.error(err))
                 }
               )
@@ -284,7 +285,7 @@ Bot.prototype.startOpenAI = () => {
           prompts.push(ctx.message.text)
         }
         const reply = await that.openAIAPI.reply(prompts)
-        await ctx.replyWithMarkdown(reply)
+        await ctx.replyWithMarkdown(reply, that.globalKeyboard)
         that.sendInfo(ctx, "Data sent: " + reply.length, 2)
       } catch (err) {
         that.sendError(ctx, err)
@@ -293,13 +294,17 @@ Bot.prototype.startOpenAI = () => {
   })
 }
 
-Bot.prototype.start = () => {
+Bot.prototype.start = async () => {
   that.startBasic()
   that.startSystem()
   that.startTorrent()
   that.startOpenAI()
 
-  that.bot.startPolling()
+  await that.bot.launch()
+}
+
+Bot.prototype.stop = async (reason) => {
+  that.bot.stop(reason)
 }
 
 module.exports = Bot
