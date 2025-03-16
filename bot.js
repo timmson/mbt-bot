@@ -175,7 +175,7 @@ Bot.prototype.startTorrent = () => {
       that.sendInfo(ctx, "Sorry :(", 1)
     } else {
       try {
-        await that.torrentApi.add(await that.bot.telegram.getFileLink(ctx.message.document.file_id))
+        await that.torrentAPI.add(await that.bot.telegram.getFileLink(ctx.message.document.file_id))
         that.sendInfo(ctx, "OK. Type /torrent to see all", 1)
       } catch (err) {
         that.sendError(ctx, err)
@@ -190,10 +190,10 @@ Bot.prototype.startTorrent = () => {
         switch (data[0]) {
           case "torrent":
             if (data[1] === "remove") {
-              await that.torrentApi.remove(data[2])
+              await that.torrentAPI.remove(data[2])
               await ctx.editMessageText("[removed]")
             } else if (data[1] === "list") {
-              let torrents = await that.torrentApi.list(data[2])
+              let torrents = await that.torrentAPI.list(data[2])
               torrents[0].files.forEach((file) => {
                   let fileId = parseInt(data[2], 10) * 10000 + Math.floor(Math.random() * 1000)
                   fileRegistry[fileId] = file.name
